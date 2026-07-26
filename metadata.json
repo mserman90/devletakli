@@ -1,0 +1,6 @@
+{
+  "name": "Devlet Aklı: Siyasi Strateji Simülasyonu",
+  "description": "Ulusal müesses nizam ve küresel sermaye ağları ile mücadeleyi simüle eden stratejik siyaset ve devlet yönetimi simülasyonu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
