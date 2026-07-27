@@ -40,10 +40,13 @@ export interface InterruptEvent {
 export interface IntelligenceFeedItem {
   id: string;
   title: string;
+  titleEN?: string;
   link: string;
   pubDate: string;
   source: string;
+  sourceEN?: string;
   category: string;
+  categoryEN?: string;
   urgency: 'NORMAL' | 'HIGH' | 'CRITICAL';
 }
 
@@ -64,3 +67,17 @@ export interface GameLog {
   message: string;
   impact?: string;
 }
+
+export interface ToastNotification {
+  id: string;
+  type: 'DANGER' | 'WARNING' | 'INFO' | 'SUCCESS';
+  title: string;
+  titleEN?: string;
+  message: string;
+  messageEN?: string;
+  timestamp: string;
+  metricCode?: 'TP' | 'KP' | 'PID' | 'GB' | 'OH' | 'KD';
+  autoCloseMs?: number;
+}
+
+

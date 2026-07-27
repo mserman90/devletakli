@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
 import { Radio, RefreshCw, AlertTriangle, ExternalLink, Zap } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
+import { Tooltip } from './Tooltip';
+import { UI_TRANSLATIONS } from '../utils/translations';
 
 export const IntelligenceTicker: React.FC = () => {
-  const { intelligenceFeed, rateLimitStatus, fetchIntelligence } = useGameStore();
+  const { intelligenceFeed, rateLimitStatus, fetchIntelligence, language } = useGameStore();
   const [isLoading, setIsLoading] = useState(false);
 
+  const t = UI_TRANSLATIONS[language].ticker;
+
   useEffect(() => {
-    // Initial fetch on mount
     handleRefresh();
   }, []);
 
@@ -20,16 +23,25 @@ export const IntelligenceTicker: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-full shadow-md text-slate-200">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+    <div className="bg-[#fefce8] text-slate-900 border-2 border-amber-900/40 rounded-sm p-3 sm:p-4 flex flex-col h-full shadow-2xl relative font-mono select-none md:rotate-[-0.5deg] hover:rotate-0 transition-transform duration-300">
+      
+      {/* Brass Pin at top corner */}
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-4 bg-amber-600 rounded-sm border border-amber-800 shadow-md flex items-center justify-center">
+        <div className="w-2 h-2 rounded-full bg-amber-300 border border-amber-950" />
+      </div>
+
+      {/* Red Official Stamp */}
+      <div className="absolute top-3 right-3 border-2 border-red-700/80 text-red-800 font-bold text-[10px] px-2 py-0.5 rounded rotate-[12deg] pointer-events-none opacity-80 uppercase tracking-widest">
+        {language === 'EN' ? 'CONFIDENTIAL // BULLETIN' : 'GİZLİ // BÜLTEN'}
+      </div>
+
+      {/* Paper Header */}
+      <div className="pb-3 border-b-2 border-dashed border-amber-900/30 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="p-1.5 bg-emerald-950 text-emerald-400 rounded-md border border-emerald-800/50">
-            <Radio className="w-4 h-4 animate-pulse" />
-          </div>
+          <Radio className="w-4 h-4 text-red-700 animate-pulse" />
           <div>
-            <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wide">CANLI İSTİHBARAT AKIŞI</h2>
-            <p className="text-[11px] text-slate-400">Algoritmik Simülasyon Akışı &amp; Kodleks Ağ Katmanı</p>
+            <h2 className="text-xs font-bold text-amber-950 uppercase tracking-widest font-serif">{t.title}</h2>
+            <p className="text-[10px] text-amber-900/70">{language === 'EN' ? 'Real-Time Telegraph & Wire Press' : 'Anlık Telgraf ve Haber Baskısı'}</p>
           </div>
         </div>
 
@@ -37,86 +49,99 @@ export const IntelligenceTicker: React.FC = () => {
           id="btn-refresh-rss"
           onClick={handleRefresh}
           disabled={isLoading}
-          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md border border-slate-700 transition-all disabled:opacity-50"
-          title="Akışı Yenile"
+          className="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded border border-amber-800/40 transition-all disabled:opacity-50"
+          title={language === 'EN' ? 'Refresh Teleprinter Feed' : 'Teleks Baskısını Yenile'}
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-emerald-400' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-amber-800' : ''}`} />
         </button>
       </div>
 
-      {/* API Rate Limit & Quota Tracking Bar (Rule 3) */}
-      <div className="my-3 p-2.5 bg-slate-950/60 rounded-lg border border-slate-800/80 text-xs">
-        <div className="flex items-center justify-between mb-1 font-mono text-[11px]">
-          <span className="text-slate-400 flex items-center gap-1">
-            <Zap className="w-3 h-3 text-amber-400" /> API KOTA DURUMU:
-          </span>
-          <span className={`font-bold ${rateLimitStatus.isWarningThreshold ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {rateLimitStatus.remaining} / {rateLimitStatus.limit} Kalan (%{rateLimitStatus.usedPercentage} kullanıldı)
+      {/* Printed Quota Meter */}
+      <div className="my-3 p-2 bg-amber-100/80 rounded border border-amber-800/30 text-[11px]">
+        <div className="flex items-center justify-between mb-1 font-bold text-amber-950">
+          <Tooltip code="API" customTitle={language === 'EN' ? 'API QUOTA SYSTEM' : 'API KOTA SİSTEMİ'}>
+            <span className="flex items-center gap-1">
+              <Zap className="w-3 h-3 text-amber-700" /> {t.quotaRatio}:
+            </span>
+          </Tooltip>
+          <span className={rateLimitStatus.isWarningThreshold ? 'text-red-700' : 'text-emerald-800'}>
+            {rateLimitStatus.remaining} / {rateLimitStatus.limit}
           </span>
         </div>
 
-        {/* Progress bar */}
-        <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+        <div className="w-full bg-amber-200/80 h-1.5 rounded-full overflow-hidden border border-amber-800/20">
           <div
             className={`h-full transition-all duration-300 ${
-              rateLimitStatus.usedPercentage >= 80 ? 'bg-amber-500' : 'bg-emerald-500'
+              rateLimitStatus.usedPercentage >= 80 ? 'bg-red-600' : 'bg-emerald-700'
             }`}
             style={{ width: `${rateLimitStatus.usedPercentage}%` }}
           />
         </div>
 
-        {/* Rule 3: %80 Quota Warning Threshold Badge */}
         {rateLimitStatus.isWarningThreshold && (
-          <div className="mt-2 p-1.5 bg-amber-950/80 border border-amber-600/50 text-amber-300 rounded text-[10px] flex items-center gap-1.5 font-mono">
-            <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-400 animate-bounce" />
-            <span>[UYARI - KOTA EŞİĞİ] API kota kullanımınız %80 limitine ulaştı!</span>
-          </div>
+          <Tooltip code="RFC 6585">
+            <div className="mt-2 p-1 bg-red-100 border border-red-400 text-red-900 rounded text-[10px] flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3 shrink-0 text-red-600" />
+              <span>{t.quotaWarning}</span>
+            </div>
+          </Tooltip>
         )}
       </div>
 
-      {/* Feed List or Explicit "Veri mevcut değil" Banner (Rule 1) */}
-      <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 scrollbar-thin scrollbar-thumb-slate-700">
+      {/* Printed Teleprinter Items */}
+      <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 scrollbar-thin scrollbar-thumb-amber-800/30">
         {intelligenceFeed.length === 0 ? (
-          <div id="no-data-banner" className="h-48 flex flex-col items-center justify-center border border-dashed border-slate-800 rounded-lg p-4 text-center">
-            <AlertTriangle className="w-8 h-8 text-slate-600 mb-2" />
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Veri mevcut değil</p>
-            <p className="text-xs text-slate-500 mt-1 max-w-[200px]">
-              {rateLimitStatus.errorMessage || 'Harici ağ akışına ulaşılamadı veya kota doldu.'}
+          <div id="no-data-banner" className="h-44 flex flex-col items-center justify-center border-2 border-dashed border-amber-800/30 rounded p-4 text-center">
+            <AlertTriangle className="w-7 h-7 text-amber-800/60 mb-2" />
+            <p className="text-xs font-bold text-amber-900 uppercase">{t.noData}</p>
+            <p className="text-[11px] text-amber-800/80 mt-1">
+              {rateLimitStatus.errorMessage || (language === 'EN' ? 'No signal on telegraph wire or quota exceeded.' : 'Telgraf hattında sinyal yok veya kota doldu.')}
             </p>
           </div>
         ) : (
-          intelligenceFeed.map((item) => (
-            <div
-              key={item.id}
-              className={`p-2.5 rounded-lg border text-xs transition-all hover:border-slate-600 ${
-                item.urgency === 'CRITICAL'
-                  ? 'bg-red-950/20 border-red-900/40 text-slate-200'
-                  : 'bg-slate-950/40 border-slate-800 text-slate-300'
-              }`}
-            >
-              <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1 font-mono">
-                <span className="text-emerald-400/90 font-semibold">{item.source}</span>
-                <span>{item.pubDate ? new Date(item.pubDate).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : 'CANLI'}</span>
+          intelligenceFeed.map((item) => {
+            const displayTitle = (language === 'EN' && item.titleEN) ? item.titleEN : item.title;
+            const displaySource = (language === 'EN' && item.sourceEN) ? item.sourceEN : item.source;
+            const displayCategory = (language === 'EN' && item.categoryEN) ? item.categoryEN : item.category;
+
+            return (
+              <div
+                key={item.id}
+                className={`p-2.5 rounded border text-xs transition-all ${
+                  item.urgency === 'CRITICAL'
+                    ? 'bg-red-50/90 border-red-300 text-red-950 shadow-sm'
+                    : 'bg-white/80 border-amber-800/20 text-slate-900 shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between text-[10px] text-amber-900/80 mb-1 border-b border-amber-800/10 pb-1">
+                  <span className="font-bold uppercase tracking-wider">{displaySource}</span>
+                  <span>{item.pubDate ? new Date(item.pubDate).toLocaleTimeString(language === 'EN' ? 'en-US' : 'tr-TR', { hour: '2-digit', minute: '2-digit' }) : (language === 'EN' ? 'LIVE' : 'ANLIK')}</span>
+                </div>
+                <h3 className="font-semibold text-slate-900 text-xs leading-snug">{displayTitle}</h3>
+                <div className="mt-2 flex items-center justify-between pt-1 border-t border-dashed border-amber-800/20">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200/80 text-amber-950 font-bold uppercase">
+                    {displayCategory}
+                  </span>
+                  {item.link && item.link !== '#' && (
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[10px] text-amber-900 hover:underline flex items-center gap-0.5 font-bold"
+                    >
+                      {language === 'EN' ? 'Details' : 'Detay'} <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  )}
+                </div>
               </div>
-              <h3 className="font-medium text-slate-200 text-xs leading-snug line-clamp-2">{item.title}</h3>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
-                  {item.category}
-                </span>
-                {item.link && item.link !== '#' && (
-                  <a
-                    href={item.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[10px] text-emerald-400 hover:underline flex items-center gap-0.5"
-                  >
-                    Detay <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                )}
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
+      </div>
+
+      {/* Perforated Receipt Bottom Edge Effect */}
+      <div className="mt-2 pt-1 border-t-2 border-dashed border-amber-900/30 text-[9px] text-amber-900/60 text-center font-mono">
+        {language === 'EN' ? '--- NATIONAL INTELLIGENCE WIRE PRESS /// END ---' : '--- MİLLİ İSTİHBARAT MASA BASKISI /// SONU ---'}
       </div>
     </div>
   );

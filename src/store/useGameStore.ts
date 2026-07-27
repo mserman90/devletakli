@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { StateVector, DecisionCard, GameLog, IntelligenceFeedItem, ApiRateLimitStatus } from '../types/game';
+import { StateVector, DecisionCard, GameLog, IntelligenceFeedItem, ApiRateLimitStatus, ToastNotification } from '../types/game';
 import { processTurn } from '../core/simulationEngine';
 import { adversarialAIEngine } from '../core/adversarialAIEngine';
 import { intelligenceService } from '../services/intelligenceService';
@@ -14,6 +14,7 @@ interface GameState {
   cardQueue: DecisionCard[];
   history: { turn: number; state: StateVector; decisionTitle: string }[];
   logs: GameLog[];
+  toasts: ToastNotification[];
   intelligenceFeed: IntelligenceFeedItem[];
   rateLimitStatus: ApiRateLimitStatus;
   isGameOver: boolean;
@@ -22,15 +23,28 @@ interface GameState {
   isSoundMuted: boolean;
   hasStartedGame: boolean;
   hasAcceptedLegalTerms: boolean;
+  language: 'TR' | 'EN';
 
   // Eylemler
   selectOption: (optionId: string) => void;
   fetchIntelligence: () => Promise<void>;
   resetGame: () => void;
   toggleSound: () => void;
+  toggleLanguage: () => void;
   startGame: () => void;
   setHasAcceptedLegalTerms: (accepted: boolean) => void;
   returnToHero: () => void;
+  addToast: (toast: Omit<ToastNotification, 'id' | 'timestamp'> & { id?: string }) => void;
+  removeToast: (id: string) => void;
+  clearToasts: () => void;
+  loadHistoricalScenario: (scenarioData: {
+    stateVector: StateVector;
+    initialCard: DecisionCard;
+    title: string;
+    era?: string;
+    description: string;
+    historicalNotes?: string[];
+  }) => void;
 }
 
 const INITIAL_VECTOR: StateVector = {
@@ -58,6 +72,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       message: 'Devlet Aklı Simülasyon Çekirdeği Başlatıldı. 6-Boyutlu Durum Vektörü Senkronize Edildi.',
     },
   ],
+  toasts: [],
   intelligenceFeed: [],
   rateLimitStatus: intelligenceService.getRateLimitStatus(),
   isGameOver: false,
@@ -66,9 +81,39 @@ export const useGameStore = create<GameState>((set, get) => ({
   isSoundMuted: false,
   hasStartedGame: false,
   hasAcceptedLegalTerms: false,
+  language: 'TR',
+
+  addToast: (toast) => {
+    const nowTime = new Date().toLocaleTimeString('tr-TR');
+    const newToast: ToastNotification = {
+      id: toast.id || `toast_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      type: toast.type,
+      title: toast.title,
+      titleEN: toast.titleEN,
+      message: toast.message,
+      messageEN: toast.messageEN,
+      metricCode: toast.metricCode,
+      timestamp: nowTime,
+      autoCloseMs: toast.autoCloseMs ?? 5000,
+    };
+
+    set((state) => ({
+      toasts: [newToast, ...state.toasts].slice(0, 5), // Maximum 5 toasts at once
+    }));
+  },
+
+  removeToast: (id: string) => {
+    set((state) => ({
+      toasts: state.toasts.filter((t) => t.id !== id),
+    }));
+  },
+
+  clearToasts: () => {
+    set({ toasts: [] });
+  },
 
   selectOption: (optionId: string) => {
-    const { stateVector, turn, activeCard, cardQueue, history, logs } = get();
+    const { stateVector, turn, activeCard, cardQueue, history, logs, toasts } = get();
     if (!activeCard) return;
 
     const selectedOption = activeCard.options.find((opt) => opt.id === optionId);
@@ -129,8 +174,92 @@ export const useGameStore = create<GameState>((set, get) => ({
       soundEngine.playUI('VICTORY');
     }
 
+    const generatedToasts: ToastNotification[] = [...toasts];
+
+    // Evaluate Danger & Warning Resource Thresholds
+    if (nextState.TP <= 15) {
+      generatedToasts.unshift({
+        id: `toast_tp_${nextTurn}_${Date.now()}`,
+        type: 'DANGER',
+        title: 'KRİTİK EŞİK: TEMİZ PARA',
+        titleEN: 'CRITICAL THRESHOLD: CLEAN CAPITAL',
+        message: 'Temiz Para rezervleri %15 seviyesine geriledi. İflas riski yüksek!',
+        messageEN: 'Clean Capital reserves dropped to 15%. High risk of financial collapse!',
+        metricCode: 'TP',
+        timestamp: nowTime,
+        autoCloseMs: 6000,
+      });
+    }
+
+    if (nextState.KD >= 75) {
+      generatedToasts.unshift({
+        id: `toast_kd_${nextTurn}_${Date.now()}`,
+        type: 'DANGER',
+        title: 'KRİTİK EŞİK: KUR VOLATİLİTESİ',
+        titleEN: 'CRITICAL THRESHOLD: CURRENCY VOLATILITY',
+        message: 'Kur Dağınıklığı (KD) %75 seviyesine tırmandı. Piyasa kilitlenme riski!',
+        messageEN: 'Currency Volatility (KD) spiked to 75%. High risk of market shock!',
+        metricCode: 'KD',
+        timestamp: nowTime,
+        autoCloseMs: 6000,
+      });
+    }
+
+    if (nextState.GB <= 15) {
+      generatedToasts.unshift({
+        id: `toast_gb_${nextTurn}_${Date.now()}`,
+        type: 'WARNING',
+        title: 'UYARI: GÖLGE BÜROKRASİ ERİMESİ',
+        titleEN: 'WARNING: BUREAUCRACY EROSION',
+        message: 'Gölge Bürokrasi %15 altına geriledi. İdari yönetim zafiyeti!',
+        messageEN: 'Shadow Bureaucracy fell below 15%. Administrative weakness!',
+        metricCode: 'GB',
+        timestamp: nowTime,
+        autoCloseMs: 5000,
+      });
+    }
+
+    if (nextState.KP >= 75) {
+      generatedToasts.unshift({
+        id: `toast_kp_${nextTurn}_${Date.now()}`,
+        type: 'WARNING',
+        title: 'UYARI: KİRLİ PARA VESAYETİ',
+        titleEN: 'WARNING: DARK CAPITAL INFILTRATION',
+        message: 'Kirli Para %75 üzerine çıktı. Oligarşik esaret tehdidi!',
+        messageEN: 'Dark Capital rose above 75%. Threat of oligarchic capture!',
+        metricCode: 'KP',
+        timestamp: nowTime,
+        autoCloseMs: 5000,
+      });
+    }
+
+    if (nextState.PID <= 20) {
+      generatedToasts.unshift({
+        id: `toast_pid_${nextTurn}_${Date.now()}`,
+        type: 'WARNING',
+        title: 'UYARI: DEMOKRASİ AŞINMASI',
+        titleEN: 'WARNING: DEMOCRACY EROSION',
+        message: 'Parti İçi Demokrasi %20 altına indi. Otoriter sapma riski!',
+        messageEN: 'Internal Party Democracy fell below 20%. Risk of autocracy!',
+        metricCode: 'PID',
+        timestamp: nowTime,
+        autoCloseMs: 5000,
+      });
+    }
+
     if (gameOver) {
       soundEngine.stopHeartbeat();
+      generatedToasts.unshift({
+        id: `toast_gameover_${Date.now()}`,
+        type: reason === 'VICTORY' ? 'SUCCESS' : 'DANGER',
+        title: reason === 'VICTORY' ? 'ZAFER: DEVLET AKLI KURULDU' : 'SİMÜLASYON ÇÖKÜŞÜ!',
+        titleEN: reason === 'VICTORY' ? 'VICTORY: STATECRAFT ESTABLISHED' : 'SIMULATION COLLAPSE!',
+        message: reason === 'VICTORY' ? 'Ulusal egemenlik zafer kazandı.' : 'Gölge mekanizmalar veya finansal çöküş gerçekleşti.',
+        messageEN: reason === 'VICTORY' ? 'National sovereignty triumphed.' : 'Oligarchic capture or financial collapse occurred.',
+        timestamp: nowTime,
+        autoCloseMs: 8000,
+      });
+
       set({
         stateVector: nextState,
         turn: nextTurn,
@@ -145,6 +274,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             message: `[OYUN SONU] Simülasyon Tamamlandı. Sonuç: ${reason}`,
           },
         ],
+        toasts: generatedToasts.slice(0, 5),
         isGameOver: true,
         gameOverReason: reason,
         isInterruptActive: false,
@@ -173,6 +303,17 @@ export const useGameStore = create<GameState>((set, get) => ({
         type: 'AI_ATTACK',
         message: `[TEHDİT SİRENİ] ${threatCard.title} devreye girdi!`,
       });
+
+      generatedToasts.unshift({
+        id: `toast_threat_${Date.now()}`,
+        type: 'DANGER',
+        title: 'ACİL SABOTAJ VE SİREN!',
+        titleEN: 'EMERGENCY SABOTAGE ALERT!',
+        message: `"${threatCard.title}" krizi tetiklendi! Acil müdahale gerekiyor.`,
+        messageEN: `"${threatCard.title}" crisis triggered! Immediate action required.`,
+        timestamp: nowTime,
+        autoCloseMs: 7000,
+      });
     } else {
       // Normal Sıradaki Kart
       soundEngine.stopHeartbeat();
@@ -188,12 +329,12 @@ export const useGameStore = create<GameState>((set, get) => ({
           title: `Devlet Aklı ve İrade Sınavı (Faz ${nextPhase})`,
           phase: nextPhase,
           category: 'POLITICS',
-          source: 'Milli Güvenlik ve Strateji Kurulu',
+          source: 'Ulusal Güvenlik ve Strateji Kurulu',
           narrative: 'Ülke kritik bir dönemeçten geçiyor. Teşkilatların ve bürokrasinin uyumu için radikal bir karar alınması bekleniyor.',
           options: [
             {
               id: `opt_gen_${nextTurn}_1`,
-              label: 'Milli Kaynakları Seferber Et ve Şeffaflığı Artır',
+              label: 'Ulusal Kaynakları Seferber Et ve Şeffaflığı Artır',
               description: 'Tabana güven ver, kamu denetimini güçlendir.',
               stateDelta: { TP: +10, PID: +10, KD: -5 },
               riskFactor: 15,
@@ -221,6 +362,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       cardQueue: nextQueue,
       history: [...history, { turn: nextTurn, state: nextState, decisionTitle: activeCard.title }],
       logs: newLogs,
+      toasts: generatedToasts.slice(0, 5),
       isInterruptActive: isInterrupt,
     });
   },
@@ -240,6 +382,15 @@ export const useGameStore = create<GameState>((set, get) => ({
           turn: get().turn,
           type: 'WARNING',
           message: `[UYARI - KOTA EŞİĞİ] API kota kullanımınız %80 limitine ulaştı! (${res.status.usedPercentage}% kullanıldı)`,
+        });
+
+        get().addToast({
+          type: 'WARNING',
+          title: 'KOTA EŞİĞİ UYARISI (API)',
+          titleEN: 'QUOTA THRESHOLD WARNING (API)',
+          message: `%80 Telgraf Limiti Doldu! (${res.status.usedPercentage}% kullanıldı)`,
+          messageEN: `80% Telegraph Limit Reached! (${res.status.usedPercentage}% used)`,
+          autoCloseMs: 5000,
         });
       }
 
@@ -288,6 +439,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ isSoundMuted: newMute });
   },
 
+  toggleLanguage: () => {
+    const newLang = get().language === 'TR' ? 'EN' : 'TR';
+    soundEngine.playUI('SELECT');
+    set({ language: newLang });
+  },
+
   startGame: () => {
     soundEngine.playUI('CONFIRM');
     set({ hasStartedGame: true });
@@ -300,5 +457,52 @@ export const useGameStore = create<GameState>((set, get) => ({
   returnToHero: () => {
     soundEngine.playUI('SELECT');
     set({ hasStartedGame: false });
+  },
+
+  loadHistoricalScenario: (data) => {
+    soundEngine.stopHeartbeat();
+    adversarialAIEngine.reset();
+    soundEngine.playUI('CONFIRM');
+
+    const nowTime = new Date().toLocaleTimeString('tr-TR');
+
+    set({
+      stateVector: { ...data.stateVector },
+      turn: 1,
+      phase: 1,
+      activeCard: data.initialCard,
+      cardQueue: INITIAL_CARDS.slice(1),
+      history: [{ turn: 1, state: { ...data.stateVector }, decisionTitle: `Tarihsel Senaryo: ${data.title}` }],
+      logs: [
+        {
+          id: `log_scenario_${Date.now()}`,
+          timestamp: nowTime,
+          turn: 1,
+          type: 'SYSTEM',
+          message: `[TARİHSEL SENARYO YÜKLENDİ] Dönem: ${data.era || 'Özel'} - ${data.title}. ${data.description}`,
+        },
+        ...(data.historicalNotes || []).map((note, idx) => ({
+          id: `log_note_${idx}_${Date.now()}`,
+          timestamp: nowTime,
+          turn: 1,
+          type: 'INTELLIGENCE' as const,
+          message: `[TARİHSEL NOT] ${note}`,
+        })),
+      ],
+      isGameOver: false,
+      gameOverReason: null,
+      isInterruptActive: false,
+      hasStartedGame: true,
+      hasAcceptedLegalTerms: true,
+    });
+
+    get().addToast({
+      type: 'INFO',
+      title: 'TARİHSEL SENARYO YÜKLENDİ',
+      titleEN: 'HISTORICAL SCENARIO LOADED',
+      message: `${data.title} (${data.era || 'Dönem'}) simülasyonu başlatıldı.`,
+      messageEN: `${data.title} (${data.era || 'Era'}) simulation initialized.`,
+      autoCloseMs: 6000,
+    });
   },
 }));

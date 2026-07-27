@@ -69,7 +69,7 @@ export class AdversarialAIEngine {
       category: 'FINANCE',
       isInterrupt: true,
       threatActor: 'GLOBAL_CAPITAL',
-      source: 'Londra & Wall Street Derecelendirme Konsorsiyumu',
+      source: 'Küresel Sermaye ve Derecelendirme Konsorsiyumu',
       narrative: `[KÜRESEL SERMAYE AĞLARI HAREKETE GEÇTİ]\n\nBağımsız finansal kaynağınız (TP: ${S.TP.toFixed(0)}) ve kontrolsüz söylem gücünüz (OH: ${S.OH.toFixed(0)}) uluslararası sermaye koridorlarında kırmızı alarm verdirdi. Uluslararası kredi derecelendirme kuruluşları ülke notunu doğrudan 'Yatırım Yapılamaz' seviyesine indirdi. Döviz piyasasında yapay likidite sıkışıklığı yaratılarak kur taarruzu başlatıldı.`,
       options: [
         {

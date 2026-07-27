@@ -23,33 +23,33 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({ isOpen, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-4xl h-[90vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 text-slate-100 shadow-2xl overflow-hidden relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+      <div className="w-full max-w-4xl h-[92vh] sm:h-[90vh] flex flex-col rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 text-slate-100 shadow-2xl overflow-hidden relative">
         
         {/* Header */}
-        <div className="bg-slate-950 px-5 py-4 border-b border-slate-800 flex items-center justify-between shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-emerald-950 text-emerald-400 rounded-lg border border-emerald-800/60">
-              <BookOpen className="w-5 h-5" />
+        <div className="bg-slate-950 px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-800 flex items-center justify-between shrink-0 gap-2">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="p-1.5 sm:p-2 bg-emerald-950 text-emerald-400 rounded-lg border border-emerald-800/60 shrink-0">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-100 tracking-wider flex items-center gap-2">
+              <h2 className="text-xs sm:text-base font-bold text-slate-100 tracking-wider flex flex-wrap items-center gap-1.5 sm:gap-2">
                 BİLGİ BANKASI / KODLEKS
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-mono border border-emerald-800">
-                  TEORİ & MİMARİ
+                <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-mono border border-emerald-800">
+                  TEORİ &amp; MİMARİ
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">Simülasyon Kullanım Kılavuzu, Sistem Mimarisi ve Sosyoloji Külliyatı</p>
+              <p className="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Simülasyon Kullanım Kılavuzu, Sistem Mimarisi ve Sosyoloji Külliyatı</p>
             </div>
           </div>
 
           <button
             id="btn-close-knowledge-base"
             onClick={handleClose}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition-all"
+            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition-all shrink-0"
             title="Kapat"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
@@ -373,7 +373,7 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({ isOpen, 
                 <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5 md:col-span-2">
                   <h4 className="font-bold text-slate-100 text-sm">Kopenhag Okulu ve "Güvenlikleştirme" (Securitization)</h4>
                   <p className="text-slate-400 leading-relaxed">
-                    Barry Buzan ve Kopenhag Okulu teorisyenlerine göre, iktidar odakları bir konuyu "milli beka" veya "güvenlik tehdidi" olarak tanımladığında olağan demokratik siyaset durdurulur ve tüm partiler aynı çizgide hizalanmaya zorlanır (Buzan et al., 1998). Oyunda araya giren <strong>Acil Durum Sabotaj Kartları (Interrupts)</strong>, sistemin bu güvenlikleştirme silahını temsil eder.
+                    Barry Buzan ve Kopenhag Okulu teorisyenlerine göre, iktidar odakları bir konuyu "ulusal beka" veya "güvenlik tehdidi" olarak tanımladığında olağan demokratik siyaset durdurulur ve tüm partiler aynı çizgide hizalanmaya zorlanır (Buzan et al., 1998). Oyunda araya giren <strong>Acil Durum Sabotaj Kartları (Interrupts)</strong>, sistemin bu güvenlikleştirme silahını temsil eder.
                   </p>
                 </div>
               </div>

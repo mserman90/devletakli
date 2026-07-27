@@ -8,12 +8,12 @@ export const INITIAL_CARDS: DecisionCard[] = [
     phase: 1,
     category: 'FINANCE',
     source: 'Parti Mali İşler Başkanlığı Raporu',
-    narrative: 'Yeni kurulan teşkilat ağının aylık kira, personel ve dijital yayın giderleri için acil nakit akışına ihtiyaç var. Büyük bir sanayi holdingi yetkilisi, yayın çizginizi hafif yumuşatmanız karşılığında örtülü 10 milyon TL fon teklif ediyor. Diğer seçenek ise mikro taban bağışlarıyla bağımsız ama yavaş ilerlemek.',
+    narrative: 'Yeni kurulan teşkilat ağının aylık kira, personel ve dijital yayın giderleri için acil nakit akışına ihtiyaç var. Büyük bir sanayi holdingi yetkilisi, yayın çizginizi hafif yumuşatmanız karşılığında örtülü 10 milyon birimlik fon teklif ediyor. Diğer seçenek ise mikro taban bağışlarıyla bağımsız ama yavaş ilerlemek.',
     options: [
       {
         id: 'opt_p1_1_a',
         label: 'Mikro Taban Bağış Kampanyası (Mobil İmece) Başlat',
-        description: 'Vatandaştan 10 TL, 20 TL kitlesel fon topla. Tam finansal özerklik sağla.',
+        description: 'Vatandaştan küçük miktarlarla kitlesel fon topla. Tam finansal özerklik sağla.',
         stateDelta: { TP: +15, KP: -10, PID: +10, KD: -5 },
         riskFactor: 10,
         consequenceText: 'Bütçe kısıtlı kaldı ancak partinizin taban nezdindeki meşruiyeti ve bağımsızlığı tavan yaptı.',
@@ -152,15 +152,15 @@ export const INITIAL_CARDS: DecisionCard[] = [
     phase: 4,
     category: 'FOREIGN',
     source: 'Hazine ve Dış Finansal İlişkiler Raporu',
-    narrative: 'Devlet borç çevirme dönemi geldi. Londra ve New York merkezli yatırım bankaları, Türkiye’nin cari açığını kapatmak için yüksek faizli sıcak para teklif ediyor. Şartları: Özelleştirmelerin hızlandırılması ve kamusal denetimlerin kaldırılması.',
+    narrative: 'Devlet borç çevirme dönemi geldi. Uluslararası finans merkezli yatırım bankaları, ulusal ekonominin cari açığını kapatmak için yüksek faizli sıcak para teklif ediyor. Şartları: Özelleştirmelerin hızlandırılması ve kamusal denetimlerin kaldırılması.',
     options: [
       {
         id: 'opt_p4_1_a',
         label: 'Uluslararası Sıcak Parayı Reddet; Yerli Üretim & Kaynak Paketi Aç',
-        description: 'Dış borçlanmayı durdur, milli kaynak atılımı yap ve bağımsızlığı ilan et.',
+        description: 'Dış borçlanmayı durdur, öz kaynak atılımı yap ve bağımsızlığı ilan et.',
         stateDelta: { TP: +20, KP: -25, KD: +15, OH: +15 },
         riskFactor: 35,
-        consequenceText: 'Küresel finans çevreleri misilleme olarak kuru zıplattı fakat milli servet kamu elinde kaldı.',
+        consequenceText: 'Küresel finans çevreleri misilleme olarak kuru zıplattı fakat kamu serveti halkın elinde kaldı.',
       },
       {
         id: 'opt_p4_1_b',

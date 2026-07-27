@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { Shield, BookOpen, Scale, Lock, Play, Activity, Cpu, CheckCircle2, AlertOctagon, HelpCircle, Award, Sparkles, ShieldCheck } from 'lucide-react';
+import { Shield, BookOpen, Scale, Lock, Play, Activity, Cpu, CheckCircle2, AlertOctagon, HelpCircle, Award, Sparkles, ShieldCheck, History } from 'lucide-react';
 import { KnowledgeBaseModal } from './KnowledgeBaseModal';
 import { DisclaimerModal } from './DisclaimerModal';
+import { HistoricalScenariosModal } from './HistoricalScenariosModal';
 import { soundEngine } from '../utils/soundEngine';
+import { Tooltip } from './Tooltip';
 
 export const HeroScreen: React.FC = () => {
-  const { hasAcceptedLegalTerms, setHasAcceptedLegalTerms, startGame } = useGameStore();
+  const { hasAcceptedLegalTerms, setHasAcceptedLegalTerms, startGame, language } = useGameStore();
   const [isKnowledgeBaseOpen, setIsKnowledgeBaseOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isHistoricalOpen, setIsHistoricalOpen] = useState(false);
 
   const handleToggleAgreement = () => {
     soundEngine.playUI('SELECT');
@@ -30,6 +33,11 @@ export const HeroScreen: React.FC = () => {
     setIsDisclaimerOpen(true);
   };
 
+  const handleOpenHistorical = () => {
+    soundEngine.playUI('SELECT');
+    setIsHistoricalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between relative overflow-hidden select-none font-sans">
       
@@ -39,7 +47,7 @@ export const HeroScreen: React.FC = () => {
       <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-30 pointer-events-none" />
 
       {/* Top Brand Bar */}
-      <header className="relative z-10 px-6 py-5 max-w-7xl mx-auto w-full flex items-center justify-between border-b border-slate-800/80">
+      <header className="relative z-10 px-4 sm:px-6 py-4 max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-800/80">
         <div className="flex items-center space-x-3">
           <div className="p-2.5 bg-emerald-600 text-slate-950 rounded-xl shadow-lg shadow-emerald-950/50">
             <Shield className="w-6 h-6" />
@@ -47,15 +55,27 @@ export const HeroScreen: React.FC = () => {
           <div>
             <span className="font-bold tracking-widest text-base text-slate-100 flex items-center gap-2 font-mono">
               DEVLET AKLI
-              <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-emerald-400 border border-emerald-500/40">
-                v2.5 PROD
-              </span>
+              <Tooltip code="PROD">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-emerald-400 border border-emerald-500/40">
+                  v2.5 PROD
+                </span>
+              </Tooltip>
             </span>
             <span className="text-xs text-slate-400 block">Siyasi Strateji &amp; Müesses Nizam Simülasyonu</span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            id="hero-btn-historical"
+            onClick={handleOpenHistorical}
+            className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 hover:bg-slate-800 border border-purple-500/60 text-purple-300 transition-all shadow-sm"
+          >
+            <History className="w-4 h-4 text-purple-400" />
+            <span className="hidden sm:inline">TARİHSEL SENARYOLAR</span>
+            <span className="sm:hidden">SENARYO</span>
+          </button>
+
           <button
             id="hero-btn-kodleks"
             onClick={handleOpenKnowledgeBase}
@@ -105,9 +125,14 @@ export const HeroScreen: React.FC = () => {
               <Cpu className="w-5 h-5" />
             </div>
             <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">6-Boyutlu Durum Engine</h3>
-            <p className="text-xs text-slate-400 leading-normal">
-              Temiz Para, Kirli Para, Parti İçi Demokrasi, Gölge Bürokrasi, Overton Hegemonyası ve Kur Dağınıklığı kaynak matrisi.
-            </p>
+            <div className="text-xs text-slate-400 leading-relaxed space-x-1">
+              <Tooltip code="TP"><span className="text-emerald-400 font-bold hover:underline">Temiz Para (TP)</span></Tooltip>,{' '}
+              <Tooltip code="KP"><span className="text-red-400 font-bold hover:underline">Kirli Para (KP)</span></Tooltip>,{' '}
+              <Tooltip code="PID"><span className="text-blue-400 font-bold hover:underline">Parti İçi Demokrasi (PID)</span></Tooltip>,{' '}
+              <Tooltip code="GB"><span className="text-purple-400 font-bold hover:underline">Gölge Bürokrasi (GB)</span></Tooltip>,{' '}
+              <Tooltip code="OH"><span className="text-amber-400 font-bold hover:underline">Overton Hegemonyası (OH)</span></Tooltip> ve{' '}
+              <Tooltip code="KD"><span className="text-teal-400 font-bold hover:underline">Kur Dağınıklığı (KD)</span></Tooltip> kaynak matrisi.
+            </div>
           </div>
 
           <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-800 backdrop-blur-sm">
@@ -162,13 +187,13 @@ export const HeroScreen: React.FC = () => {
             </span>
           </label>
 
-          {/* Action CTA Button */}
-          <div className="pt-2">
+          {/* Action CTA Buttons */}
+          <div className="pt-2 flex flex-col sm:flex-row gap-3">
             <button
               id="hero-btn-start-game"
               onClick={handleStart}
               disabled={!hasAcceptedLegalTerms}
-              className={`w-full py-4 px-6 rounded-xl font-bold font-mono text-sm md:text-base transition-all flex items-center justify-center gap-3 ${
+              className={`flex-1 py-4 px-5 rounded-xl font-bold font-mono text-xs md:text-sm transition-all flex items-center justify-center gap-2.5 ${
                 hasAcceptedLegalTerms
                   ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-950/60 hover:scale-[1.01] active:scale-[0.99] cursor-pointer'
                   : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-80'
@@ -177,22 +202,31 @@ export const HeroScreen: React.FC = () => {
               {hasAcceptedLegalTerms ? (
                 <>
                   <ShieldCheck className="w-5 h-5 text-emerald-300" />
-                  <span>SİMÜLASYONU BAŞLAT // MAKAMA GEÇ</span>
+                  <span>SİMÜLASYONU BAŞLAT</span>
                 </>
               ) : (
                 <>
                   <Lock className="w-5 h-5 text-slate-500" />
-                  <span>SİMÜLASYONU BAŞLATMAK İÇİN YASAL UYARIYI ONAYLAYIN</span>
+                  <span>SİMÜLASYONU BAŞLAT (YASAL ONAY GEREKİR)</span>
                 </>
               )}
             </button>
 
-            {!hasAcceptedLegalTerms && (
-              <p className="text-[11px] text-amber-400/90 font-mono mt-2 text-center">
-                * Oyuna başlayabilmek için yukarıdaki yasal onay kutusunu işaretlemelisiniz.
-              </p>
-            )}
+            <button
+              id="hero-btn-historical-cta"
+              onClick={handleOpenHistorical}
+              className="py-4 px-5 bg-purple-950/80 hover:bg-purple-900/90 text-purple-200 border border-purple-500/60 rounded-xl font-bold font-mono text-xs md:text-sm transition-all flex items-center justify-center gap-2 shadow-xl shadow-purple-950/40 cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <History className="w-5 h-5 text-purple-400" />
+              <span>TARİHSEL SENARYO SEÇ (1970-2008)</span>
+            </button>
           </div>
+
+          {!hasAcceptedLegalTerms && (
+            <p className="text-[11px] text-amber-400/90 font-mono text-center">
+              * Oyuna doğrudan başlamak için yukarıdaki yasal onay kutusunu işaretlemelisiniz.
+            </p>
+          )}
 
         </div>
 
@@ -220,6 +254,11 @@ export const HeroScreen: React.FC = () => {
       <DisclaimerModal
         isOpen={isDisclaimerOpen}
         onClose={() => setIsDisclaimerOpen(false)}
+      />
+
+      <HistoricalScenariosModal
+        isOpen={isHistoricalOpen}
+        onClose={() => setIsHistoricalOpen(false)}
       />
 
     </div>
