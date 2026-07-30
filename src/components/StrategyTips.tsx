@@ -74,8 +74,8 @@ export const StrategyTips: React.FC = () => {
     TP: { nameTR: 'Temiz Para', nameEN: 'Clean Capital', color: 'text-emerald-400 border-emerald-500 bg-emerald-950/80' },
     KP: { nameTR: 'Kirli Para', nameEN: 'Dark Capital', color: 'text-red-400 border-red-500 bg-red-950/80' },
     PID: { nameTR: 'Parti İçi Demokrasi', nameEN: 'Internal Democracy', color: 'text-blue-400 border-blue-500 bg-blue-950/80' },
-    GB: { nameTR: 'Gölge Bürokrasi', nameEN: 'Shadow Bureaucracy', color: 'text-purple-400 border-purple-500 bg-purple-950/80' },
-    OH: { nameTR: 'Overton Hegemonyası', nameEN: 'Overton Window', color: 'text-amber-400 border-amber-500 bg-amber-950/80' },
+    GB: { nameTR: 'Bürokratik Nüfuz & GB', nameEN: 'Bureaucratic Influence & GB', color: 'text-purple-400 border-purple-500 bg-purple-950/80' },
+    OH: { nameTR: 'Kamuoyu & Söylem Hegemonyası', nameEN: 'Public Opinion & Hegemony', color: 'text-amber-400 border-amber-500 bg-amber-950/80' },
     KD: { nameTR: 'Kur Dağınıklığı', nameEN: 'Currency Volatility', color: 'text-pink-400 border-pink-500 bg-pink-950/80' },
   };
 

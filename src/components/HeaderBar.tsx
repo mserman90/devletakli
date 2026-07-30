@@ -85,12 +85,12 @@ export const HeaderBar: React.FC = () => {
               <span className="text-amber-300 font-semibold text-[11px] sm:text-xs">
                 {language === 'EN' ? (
                   phase === 1 ? 'Grassroots Surge' :
-                  phase === 2 ? 'Discourse Hegemony' :
-                  phase === 3 ? 'Shadow Bureaucracy' : 'Sovereignty Trial'
+                  phase === 2 ? <Tooltip code="KAMUOYU HEGEMONYASI" position="bottom">Discourse Hegemony</Tooltip> :
+                  phase === 3 ? <Tooltip code="BÜROKRATİK NÜFUZ" position="bottom">Shadow Bureaucracy</Tooltip> : 'Sovereignty Trial'
                 ) : (
                   phase === 1 ? 'Tabana İnme' :
-                  phase === 2 ? 'Söylem Hegemonyası' :
-                  phase === 3 ? 'Gölge Bürokrasi' : 'Egemenlik Sınavı'
+                  phase === 2 ? <Tooltip code="KAMUOYU HEGEMONYASI" position="bottom">Söylem Hegemonyası</Tooltip> :
+                  phase === 3 ? <Tooltip code="BÜROKRATİK NÜFUZ" position="bottom">Gölge Bürokrasi</Tooltip> : 'Egemenlik Sınavı'
                 )}
               </span>
             </div>

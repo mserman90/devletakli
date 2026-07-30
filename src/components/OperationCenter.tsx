@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HeaderBar } from './HeaderBar';
+import { ResourceDashboard } from './ResourceDashboard';
 import { IntelligenceTicker } from './IntelligenceTicker';
 import { DecisionDesk } from './DecisionDesk';
 import { StrategyTips } from './StrategyTips';
@@ -8,12 +9,12 @@ import { LogConsole } from './LogConsole';
 import { GameOverModal } from './GameOverModal';
 import { DisclaimerModal } from './DisclaimerModal';
 import { ToastContainer } from './ToastContainer';
-import { ShieldAlert, Scale, Compass, Radio, Activity, Terminal, Layers } from 'lucide-react';
+import { ShieldAlert, Scale, Compass, Radio, Activity, Terminal, Layers, Gauge } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
 import { useGameStore } from '../store/useGameStore';
 import { UI_TRANSLATIONS } from '../utils/translations';
 
-type MobileTab = 'DECISION' | 'INTELLIGENCE' | 'TELEMETRY' | 'LOGS' | 'ALL';
+type MobileTab = 'RESOURCE' | 'DECISION' | 'INTELLIGENCE' | 'TELEMETRY' | 'LOGS' | 'ALL';
 
 export const OperationCenter: React.FC = () => {
   const language = useGameStore((state) => state.language);
@@ -55,6 +56,18 @@ export const OperationCenter: React.FC = () => {
           >
             <Layers className="w-3.5 h-3.5" />
             <span>{t.ALL}</span>
+          </button>
+
+          <button
+            onClick={() => handleTabSelect('RESOURCE')}
+            className={`px-2.5 py-1.5 rounded-lg border flex items-center gap-1.5 shrink-0 transition-all text-[11px] font-bold ${
+              mobileTab === 'RESOURCE'
+                ? 'bg-indigo-600 border-indigo-400 text-slate-950 shadow'
+                : 'bg-slate-900 border-slate-700 text-slate-300'
+            }`}
+          >
+            <Gauge className="w-3.5 h-3.5" />
+            <span>{language === 'EN' ? 'RESOURCES' : 'KAYNAKLAR'}</span>
           </button>
 
           <button
@@ -110,6 +123,13 @@ export const OperationCenter: React.FC = () => {
       {/* Main Responsive Grid Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-3 md:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         
+        {/* Resource Dashboard - Macro Balances */}
+        {(mobileTab === 'ALL' || mobileTab === 'RESOURCE') && (
+          <div className="order-first lg:col-span-12">
+            <ResourceDashboard />
+          </div>
+        )}
+
         {/* Decision Desk & AI Strategy Advisor */}
         {(mobileTab === 'ALL' || mobileTab === 'DECISION') && (
           <div className="order-1 lg:order-2 lg:col-span-5 flex flex-col gap-3 sm:gap-4 min-h-[460px] sm:min-h-[480px]">

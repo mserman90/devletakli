@@ -60,8 +60,8 @@ Provide a concise, highly insightful, tactical strategy briefing for the player 
     `;
 
     const systemInstruction = lang === "EN"
-      ? "You are an elite political strategist and game theory advisor. Analyze resource levels, pinpoint immediate danger metrics, and give direct tactical recommendations."
-      : "Sen duayen bir siyaset sosyologu, oyun teorisyeni ve Devlet Aklı stratejistisin. Mevcut 6-boyutlu durum vektörünü analiz ederek oyuncunun kaçınması gereken tuzakları ve öncelikli yapması gereken stratejik hamleyi söyle.";
+      ? "You are an elite political strategist and game theory advisor. Analyze resource levels, pinpoint immediate danger metrics, and give direct tactical recommendations. ANONYMIZATION REQUIREMENT: Do NOT reference real country names (e.g. Turkey), real city names, or real politician names. Use abstract, anonymous state terminology."
+      : "Sen duayen bir siyaset sosyologu, oyun teorisyeni ve Devlet Aklı stratejistisin. Mevcut 6-boyutlu durum vektörünü analiz ederek oyuncunun kaçınması gereken tuzakları ve öncelikli yapması gereken stratejik hamleyi söyle. ANONİMLEŞTİRME KURALI: Gerçek ülke isimleri (Türkiye gibi), şehir isimleri veya gerçek siyasetçi isimleri KULLANMA. Soyut ve anonim devlet terimleri kullan.";
 
     try {
       const ai = getGeminiClient();
@@ -284,13 +284,13 @@ app.post("/api/historical-scenarios", async (req, res) => {
           options: [
             {
               id: "opt_1",
-              label: lang === "EN" ? "Seize insolvent banks under TMSF state audit council." : "TMSF el koyma kararıyla batan bankalara el koyup varlıklarına el koyun.",
+              label: lang === "EN" ? "Seize insolvent banks under BTK state audit council." : "BTK el koyma kararıyla batan bankalara el koyup varlıklarını kamulaştırın.",
               description: lang === "EN" ? "Confiscate assets of corrupt bank owners." : "Hortumcu banka sahiplerinin varlıklarına kamu el koysun.",
               stateDelta: { TP: +20, KP: -25, PID: +10, GB: +15, OH: +15, KD: -15 },
-              consequenceText: lang === "EN" ? "TMSF intervention dealt a heavy blow to offshore capital rings." : "TMSF operasyonu kirli sermayeyi geriletti.",
-              text: lang === "EN" ? "Seize insolvent banks under TMSF state audit council." : "TMSF el koyma kararıyla batan bankalara el koyup varlıklarına el koyun.",
+              consequenceText: lang === "EN" ? "BTK intervention dealt a heavy blow to offshore capital rings." : "BTK operasyonu kirli sermayeyi geriletti.",
+              text: lang === "EN" ? "Seize insolvent banks under BTK state audit council." : "BTK el koyma kararıyla batan bankalara el koyup varlıklarını kamulaştırın.",
               impact: { TP: +20, KP: -25, PID: +10, GB: +15, OH: +15, KD: -15 },
-              logMessage: lang === "EN" ? "TMSF intervention dealt a heavy blow to offshore capital rings." : "TMSF operasyonu kirli sermayeyi geriletti.",
+              logMessage: lang === "EN" ? "BTK intervention dealt a heavy blow to offshore capital rings." : "BTK operasyonu kirli sermayeyi geriletti.",
             },
             {
               id: "opt_2",
@@ -309,11 +309,11 @@ app.post("/api/historical-scenarios", async (req, res) => {
         ],
       },
       "2001": {
-        title: lang === "EN" ? "2001 Devaluation Shock & IMF Rescue Program" : "2001 Kara Çarşamba ve Anayasa Kitapçığı Krizi",
+        title: lang === "EN" ? "2001 Devaluation Shock & IMF Rescue Program" : "2001 Devalüasyon Şoku ve Kurumsal Kriz",
         era: "2001-2002",
         description: lang === "EN"
-          ? "Overnight interest rates reach 7500%, constitutional booklet crisis triggers sudden currency devaluation and banking system crash."
-          : "Gecelik faizlerin %7500'e fırladığı, Anayasa kitapçığı kriziyle döviz çıpasının çöktüğü tarihi finansal kilitlenme.",
+          ? "Overnight interest rates reach 7500%, institutional crisis triggers sudden currency devaluation and banking system crash."
+          : "Gecelik faizlerin %7500'e fırladığı, yüksek bürokratik krizle döviz çıpasının çöktüğü tarihi finansal kilitlenme.",
         stateVector: { TP: 20, KP: 70, PID: 40, GB: 30, OH: 35, KD: 95 },
         initialCard: {
           id: "hist_card_2001",
@@ -321,15 +321,15 @@ app.post("/api/historical-scenarios", async (req, res) => {
           category: lang === "EN" ? "Macro Finance" : "Makro Finans",
           description: lang === "EN"
             ? "Banking sector illiquid. Exchange rate peg abandoned. Middle-class savings wiped out in 24 hours."
-            : "Bankacılık sistemi kilitlendi. Sabit kur terk edildi. TL bir gecede %40 değer kaybetti.",
+            : "Bankacılık sistemi kilitlendi. Sabit kur terk edildi. Ulusal para birimi bir gecede %40 değer kaybetti.",
           options: [
             {
               id: "opt_1",
-              label: lang === "EN" ? "Appoint independent technocrat minister and pass Kemal Derviş reforms." : "Bağımsız teknokrat bakan atayıp Güçlü Ekonomiye Geçiş Programı ilan edin.",
+              label: lang === "EN" ? "Appoint independent technocrat minister and pass emergency stabilization reforms." : "Bağımsız teknokrat bakan atayıp Güçlü Ekonomiye Geçiş Programı ilan edin.",
               description: lang === "EN" ? "Implement strict fiscal discipline and central bank independence." : "Merkez bankası bağımsızlığı ve sıkı mali disiplin uygulayın.",
               stateDelta: { TP: +25, KP: -15, PID: -5, GB: +20, OH: +10, KD: -35 },
               consequenceText: lang === "EN" ? "Technocratic reform stabilized currency but reduced political autonomy." : "Teknokrat reform kuru dizginledi fakat idari vesayeti artırdı.",
-              text: lang === "EN" ? "Appoint independent technocrat minister and pass Kemal Derviş reforms." : "Bağımsız teknokrat bakan atayıp Güçlü Ekonomiye Geçiş Programı ilan edin.",
+              text: lang === "EN" ? "Appoint independent technocrat minister and pass emergency stabilization reforms." : "Bağımsız teknokrat bakan atayıp Güçlü Ekonomiye Geçiş Programı ilan edin.",
               impact: { TP: +25, KP: -15, PID: -5, GB: +20, OH: +10, KD: -35 },
               logMessage: lang === "EN" ? "Technocratic reform stabilized currency but reduced political autonomy." : "Teknokrat reform kuru dizginledi fakat idari vesayeti artırdı.",
             },
@@ -405,8 +405,8 @@ app.post("/api/historical-scenarios", async (req, res) => {
     try {
       const ai = getGeminiClient();
       const systemInstruction = lang === "EN"
-        ? "You are a master political historian and game designer. Create a rich historical or political crisis starting scenario with balanced 6D State Vector values (TP, KP, PID, GB, OH, KD) and a compelling initial decision card."
-        : "Sen usta bir siyaset tarihçisi ve oyun tasarımcısısın. 6-boyutlu kaynak vektörü (TP, KP, PID, GB, OH, KD) ve sürükleyici bir başlangıç karar kartı içeren tarihi/siyasi kriz senaryosu üret.";
+        ? "You are a master political historian and game designer. Create a rich historical or political crisis starting scenario with balanced 6D State Vector values (TP, KP, PID, GB, OH, KD) and a compelling initial decision card. ANONYMIZATION REQUIREMENT: NEVER use real country names (such as Turkey), real city names (such as Ankara, Istanbul), or real politician names. Always use generic, fictional, or anonymized country and institutional titles (e.g., 'Central Republic', 'Federal State', 'Central Bank', 'State Audit Board')."
+        : "Sen usta bir siyaset tarihçisi ve oyun tasarımcısısın. 6-boyutlu kaynak vektörü (TP, KP, PID, GB, OH, KD) ve sürükleyici bir başlangıç karar kartı içeren tarihi/siyasi kriz senaryosu üret. ANONİMLEŞTİRME KURALI: Türkiye veya başka gerçek ülke isimleri, şehir isimleri (Ankara, İstanbul gibi) veya gerçek siyasetçi/kişi isimleri ASLA KULLANMA. Yerine anonim, kurgusal veya kurumsal isimler (ör. 'Makam Ülkesi', 'Merkez Devleti', 'Banka Tasfiye Konseyi') kullan.";
 
       const response = await ai.models.generateContent({
         model: "gemini-3.6-flash",

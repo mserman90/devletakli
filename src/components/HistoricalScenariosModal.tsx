@@ -71,9 +71,9 @@ export const HistoricalScenariosModal: React.FC<HistoricalScenariosModalProps> =
     {
       id: '2001',
       era: '2001-2002',
-      titleTR: '2001 Kara Çarşamba ve Anayasa Kitapçığı Şoku',
+      titleTR: '2001 Devalüasyon Şoku ve Kurumsal Kriz',
       titleEN: '2001 Devaluation Shock & IMF Rescue Program',
-      descTR: '%7500 gecelik faiz, çöken TL, bankacılık kilitlenmesi ve teknokrat reform ihtiyacı.',
+      descTR: '%7500 gecelik faiz, çöken ulusal para birimi, bankacılık kilitlenmesi ve teknokrat reform ihtiyacı.',
       descEN: '7500% overnight interest, currency devaluation, and technocratic rescue reforms.',
       icon: <TrendingDown className="w-5 h-5 text-red-400" />,
       badge: 'MALT KİLİTLENME',
@@ -279,8 +279,8 @@ export const HistoricalScenariosModal: React.FC<HistoricalScenariosModalProps> =
             </div>
             <p className="text-xs text-slate-400 font-sans">
               {language === 'EN'
-                ? 'Type any specific historical event, country crisis, or hypothetical political scenario (e.g. "1994 Turkish lira devaluation", "1929 Great Depression", "2010 Eurozone crisis"). Gemini will construct a fully customized 6D starting vector and crisis card.'
-                : 'İstediğiniz spesifik dönemi veya kurgusal krizi yazın (ör. "1994 Ekonomik Kararları", "1960 Yassıada Sonrası Sivil Dönem", "1929 Büyük Buhranında Türkiye"). Gemini AI özel durum vektörü ve karar kartı oluşturacaktır.'}
+                ? 'Type any specific historical event, country crisis, or hypothetical political scenario (e.g. "1994 Sovereign currency devaluation", "1929 Great Depression", "2010 Eurozone crisis"). Gemini will construct a fully customized 6D starting vector and crisis card.'
+                : 'İstediğiniz spesifik dönemi veya kurgusal krizi yazın (ör. "1994 Acil İstikrar Paketleri", "1960 Sıkıyönetim Sonrası Sivil Dönem", "1929 Büyük Buhranı"). Gemini AI özel durum vektörü ve karar kartı oluşturacaktır.'}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-2">
@@ -290,8 +290,8 @@ export const HistoricalScenariosModal: React.FC<HistoricalScenariosModalProps> =
                 onChange={(e) => setCustomPrompt(e.target.value)}
                 placeholder={
                   language === 'EN'
-                    ? 'e.g., 1994 Economic Decisions & Lira Devaluation...'
-                    : 'ör., 1994 Çiller Ekonomik Kararları ve Devalüasyon Krizi...'
+                    ? 'e.g., 1994 Emergency Economic Package & Devaluation Crisis...'
+                    : 'ör., 1994 Acil Ekonomik Paketler ve Devalüasyon Krizi...'
                 }
                 className="flex-1 px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans"
               />

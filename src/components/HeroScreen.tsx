@@ -129,8 +129,8 @@ export const HeroScreen: React.FC = () => {
               <Tooltip code="TP"><span className="text-emerald-400 font-bold hover:underline">Temiz Para (TP)</span></Tooltip>,{' '}
               <Tooltip code="KP"><span className="text-red-400 font-bold hover:underline">Kirli Para (KP)</span></Tooltip>,{' '}
               <Tooltip code="PID"><span className="text-blue-400 font-bold hover:underline">Parti İçi Demokrasi (PID)</span></Tooltip>,{' '}
-              <Tooltip code="GB"><span className="text-purple-400 font-bold hover:underline">Gölge Bürokrasi (GB)</span></Tooltip>,{' '}
-              <Tooltip code="OH"><span className="text-amber-400 font-bold hover:underline">Overton Hegemonyası (OH)</span></Tooltip> ve{' '}
+              <Tooltip code="BÜROKRATİK NÜFUZ"><span className="text-purple-400 font-bold hover:underline">Bürokratik Nüfuz & GB</span></Tooltip>,{' '}
+              <Tooltip code="KAMUOYU HEGEMONYASI"><span className="text-amber-400 font-bold hover:underline">Kamuoyu Hegemonyası & OH</span></Tooltip> ve{' '}
               <Tooltip code="KD"><span className="text-teal-400 font-bold hover:underline">Kur Dağınıklığı (KD)</span></Tooltip> kaynak matrisi.
             </div>
           </div>

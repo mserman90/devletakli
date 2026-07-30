@@ -2,6 +2,7 @@ import React from 'react';
 import { useGameStore } from '../store/useGameStore';
 import { Award, AlertTriangle, ShieldX, Skull, RotateCcw, Activity } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
+import { Tooltip } from './Tooltip';
 
 export const GameOverModal: React.FC = () => {
   const { isGameOver, gameOverReason, resetGame, turn, stateVector, language } = useGameStore();
@@ -84,12 +85,12 @@ export const GameOverModal: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 text-slate-300 text-[11px] sm:text-xs">
-            <div>TP ({language === 'EN' ? 'Clean Capital' : 'Temiz Para'}): <span className="font-bold text-emerald-400">{stateVector.TP.toFixed(1)}</span></div>
-            <div>KP ({language === 'EN' ? 'Dark Capital' : 'Kirli Para'}): <span className="font-bold text-red-400">{stateVector.KP.toFixed(1)}</span></div>
-            <div>PID ({language === 'EN' ? 'Democracy' : 'Demokrasi'}): <span className="font-bold text-blue-400">{stateVector.PID.toFixed(1)}</span></div>
-            <div>GB ({language === 'EN' ? 'Bureaucracy' : 'Bürokrasi'}): <span className="font-bold text-purple-400">{stateVector.GB.toFixed(1)}</span></div>
-            <div>OH (Overton): <span className="font-bold text-amber-400">{stateVector.OH.toFixed(1)}</span></div>
-            <div>KD ({language === 'EN' ? 'Volatility' : 'Kur Volatilitesi'}): <span className="font-bold text-pink-400">{stateVector.KD.toFixed(1)}</span></div>
+            <Tooltip code="TP"><div>TP ({language === 'EN' ? 'Clean Capital' : 'Temiz Para'}): <span className="font-bold text-emerald-400">{stateVector.TP.toFixed(1)}</span></div></Tooltip>
+            <Tooltip code="KP"><div>KP ({language === 'EN' ? 'Dark Capital' : 'Kirli Para'}): <span className="font-bold text-red-400">{stateVector.KP.toFixed(1)}</span></div></Tooltip>
+            <Tooltip code="PID"><div>PID ({language === 'EN' ? 'Democracy' : 'Demokrasi'}): <span className="font-bold text-blue-400">{stateVector.PID.toFixed(1)}</span></div></Tooltip>
+            <Tooltip code="BÜROKRATİK NÜFUZ"><div>GB ({language === 'EN' ? 'Bureaucracy' : 'Bürokratik Nüfuz'}): <span className="font-bold text-purple-400">{stateVector.GB.toFixed(1)}</span></div></Tooltip>
+            <Tooltip code="KAMUOYU HEGEMONYASI"><div>OH ({language === 'EN' ? 'Public Hegemony' : 'Kamuoyu Hegemonyası'}): <span className="font-bold text-amber-400">{stateVector.OH.toFixed(1)}</span></div></Tooltip>
+            <Tooltip code="KD"><div>KD ({language === 'EN' ? 'Volatility' : 'Kur Volatilitesi'}): <span className="font-bold text-pink-400">{stateVector.KD.toFixed(1)}</span></div></Tooltip>
           </div>
         </div>
 

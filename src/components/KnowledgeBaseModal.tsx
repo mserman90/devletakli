@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, X, Shield, Cpu, Book, FileText, AlertTriangle, CheckCircle2, DollarSign, Users, Landmark, Globe, Activity, HelpCircle, Scale } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
+import { Tooltip } from './Tooltip';
 
 interface KnowledgeBaseModalProps {
   isOpen: boolean;
@@ -165,19 +166,25 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({ isOpen, 
 
                   <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
                     <span className="text-purple-400 font-bold flex items-center gap-1.5 mb-1 text-sm">
-                      <Shield className="w-4 h-4" /> [GB] Gölge Bürokrasi (Kurumsal Hafıza)
+                      <Shield className="w-4 h-4" />
+                      <Tooltip code="BÜROKRATİK NÜFUZ">
+                        <span className="cursor-help hover:underline">[GB] Gölge Bürokrasi (Bürokratik Nüfuz ve Hafıza)</span>
+                      </Tooltip>
                     </span>
                     <p className="text-slate-400 text-xs font-sans">
-                      Kendi yetiştirdiğiniz bağımsız teknokratlar, düşünce kuruluşları (think-tank) ve alternatif devlet hafızanızdır. İktidara geldiğinizde bürokratik sabotajları engellemek için <strong>kalkan görevi</strong> görür.
+                      Kendi yetiştirdiğiniz bağımsız teknokratlar, düşünce kuruluşları (think-tank) ve alternatif devlet hafızanızdır. İktidara geldiğinizde <Tooltip code="BÜROKRATİK NÜFUZ"><span className="text-purple-300 font-semibold underline decoration-dotted">bürokratik sabotajları ve nüfuz baskısını</span></Tooltip> engellemek için kalkan görevi görür.
                     </p>
                   </div>
 
                   <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg">
                     <span className="text-amber-400 font-bold flex items-center gap-1.5 mb-1 text-sm">
-                      <Landmark className="w-4 h-4" /> [OH] Overton Hegemonyası (Söylem Gücü)
+                      <Landmark className="w-4 h-4" />
+                      <Tooltip code="KAMUOYU HEGEMONYASI">
+                        <span className="cursor-help hover:underline">[OH] Kamuoyu & Söylem Hegemonyası</span>
+                      </Tooltip>
                     </span>
                     <p className="text-slate-400 text-xs font-sans">
-                      Kendi bağımsız medya ağınızın gücü ve halkın ne düşüneceğini belirleme kapasitenizdir. Bu puan düşükse, en iyi reform kararlarınız bile halkta karşılık bulmaz.
+                      Kendi bağımsız medya ağınızın gücü ve <Tooltip code="KAMUOYU HEGEMONYASI"><span className="text-amber-300 font-semibold underline decoration-dotted">kamuoyunu ve toplumsal rızayı</span></Tooltip> yönlendirme kapasitenizdir. Bu puan düşükse, en iyi reform kararlarınız bile halkta karşılık bulmaz.
                     </p>
                   </div>
 
@@ -359,7 +366,11 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({ isOpen, 
                 <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5">
                   <h4 className="font-bold text-slate-100 text-sm">Max Weber ve "Bürokratik Demir Kafes"</h4>
                   <p className="text-slate-400 leading-relaxed">
-                    Weber, modern devlet bürokrasisinin siyasetçileri sarmalayan devasa, rasyonel ve aşılmaz bir demir kafes olduğunu belirtir (Weber, 1922/1978). İktidara gelen siyasiler, kurum hafızasından yoksunsa bürokrasinin esiri olurlar. Oyundaki <strong>[GB] (Gölge Bürokrasi) kaynağının</strong> bürokratik muhtıraları sönümleyen tek kalkan olarak tasarlanması bu teze dayanır.
+                    Weber, modern devlet bürokrasisinin siyasetçileri sarmalayan devasa, rasyonel ve aşılmaz bir demir kafes olduğunu belirtir (Weber, 1922/1978). İktidara gelen siyasiler, kurum hafızasından yoksunsa bürokrasinin esiri olurlar. Oyundaki{' '}
+                    <Tooltip code="BÜROKRATİK NÜFUZ">
+                      <strong className="text-purple-300 underline decoration-dotted cursor-help">[GB] (Bürokratik Nüfuz & Gölge Bürokrasi) kaynağının</strong>
+                    </Tooltip>{' '}
+                    bürokratik muhtıraları sönümleyen tek kalkan olarak tasarlanması bu teze dayanır.
                   </p>
                 </div>
 

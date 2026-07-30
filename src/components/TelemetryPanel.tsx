@@ -51,22 +51,22 @@ const METRICS: VariableMeta[] = [
   {
     key: 'GB',
     label: 'GB',
-    fullNameTR: 'Gölge Bürokrasi',
-    fullNameEN: 'Shadow Bureaucracy',
+    fullNameTR: 'Bürokratik Nüfuz & Gölge Bürokrasi',
+    fullNameEN: 'Bureaucratic Influence & Shadow Bureaucracy',
     color: '#8b5cf6', // purple
     icon: <Shield className="w-3.5 h-3.5 text-purple-400" />,
-    descTR: 'Kurumsal hafıza ve teknokratik güç.',
-    descEN: 'Institutional memory and technocratic power.',
+    descTR: 'Bürokratik vesayet, kurumsal hafıza ve teknokratik sevk gücü.',
+    descEN: 'Bureaucratic tutelage, institutional memory, and technocratic authority.',
   },
   {
     key: 'OH',
     label: 'OH',
-    fullNameTR: 'Overton Hegemonyası',
-    fullNameEN: 'Overton Hegemony',
+    fullNameTR: 'Kamuoyu & Söylem Hegemonyası',
+    fullNameEN: 'Public Opinion & Discourse Hegemony',
     color: '#f59e0b', // amber
     icon: <Landmark className="w-3.5 h-3.5 text-amber-400" />,
-    descTR: 'Otonom medya ve söylem hakimiyeti.',
-    descEN: 'Autonomous media and discourse dominance.',
+    descTR: 'Otonom medya, kamuoyu algısı ve söylem hakimiyeti.',
+    descEN: 'Autonomous media, public perception, and discourse dominance.',
   },
   {
     key: 'KD',
