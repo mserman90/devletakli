@@ -466,11 +466,29 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const nowTime = new Date().toLocaleTimeString('tr-TR');
 
+    const rawCard = data.initialCard || ({} as any);
+    const normalizedCard: DecisionCard = {
+      id: rawCard.id || `hist_card_${Date.now()}`,
+      title: rawCard.title || data.title,
+      phase: 1,
+      category: (rawCard.category as any) || 'FINANCE',
+      narrative: rawCard.narrative || rawCard.description || data.description || '',
+      source: rawCard.source || 'Tarihsel Arşiv',
+      options: (rawCard.options || []).map((opt: any, idx: number) => ({
+        id: opt.id || `opt_${idx + 1}`,
+        label: opt.label || opt.text || `Direktif ${idx + 1}`,
+        description: opt.description || opt.text || opt.logMessage || '',
+        stateDelta: opt.stateDelta || opt.impact || {},
+        riskFactor: opt.riskFactor ?? Math.floor(Math.random() * 40 + 20),
+        consequenceText: opt.consequenceText || opt.logMessage || 'Tarihsel karar kayda geçti.',
+      })),
+    };
+
     set({
       stateVector: { ...data.stateVector },
       turn: 1,
       phase: 1,
-      activeCard: data.initialCard,
+      activeCard: normalizedCard,
       cardQueue: INITIAL_CARDS.slice(1),
       history: [{ turn: 1, state: { ...data.stateVector }, decisionTitle: `Tarihsel Senaryo: ${data.title}` }],
       logs: [

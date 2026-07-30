@@ -155,7 +155,7 @@ export const DecisionDesk: React.FC = () => {
 
               {/* State Delta Badges */}
               <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex flex-wrap gap-1.5 text-[10px] font-mono">
-                {Object.entries(option.stateDelta).map(([key, val]) => {
+                {Object.entries(option.stateDelta || {}).map(([key, val]) => {
                   if (val === undefined || val === 0) return null;
                   const isPos = val > 0;
                   return (

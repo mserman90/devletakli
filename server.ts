@@ -191,18 +191,30 @@ app.post("/api/historical-scenarios", async (req, res) => {
           options: [
             {
               id: "opt_1",
+              label: lang === "EN" ? "Enforce price controls and fuel rationing cards." : "Karaborsayı engellemek için fiyat sabitlemesi ve karne uygulamasına geçin.",
+              description: lang === "EN" ? "Enforce strict price caps on essentials." : "Temel ihtiyaç maddelerine sıkı tavan fiyat uygulayın.",
+              stateDelta: { TP: -5, KP: +15, PID: -10, GB: +10, OH: -15, KD: +15 },
+              consequenceText: lang === "EN" ? "Price controls fueled black market profits." : "Fiyat kontrolleri karaborsa rantını tırmandırdı.",
               text: lang === "EN" ? "Enforce price controls and fuel rationing cards." : "Karaborsayı engellemek için fiyat sabitlemesi ve karne uygulamasına geçin.",
               impact: { TP: -5, KP: +15, PID: -10, GB: +10, OH: -15, KD: +15 },
               logMessage: lang === "EN" ? "Price controls fueled black market profits." : "Fiyat kontrolleri karaborsa rantını tırmandırdı.",
             },
             {
               id: "opt_2",
+              label: lang === "EN" ? "Sign emergency IMF austerity standby agreement." : "IMF ile acil standby anlaşması imzalayıp devalüasyon yapın.",
+              description: lang === "EN" ? "Secure foreign currency reserves under strict IMF supervision." : "IMF denetiminde acil döviz kredisini temine koyulun.",
+              stateDelta: { TP: +20, KP: -10, PID: -5, GB: -10, OH: -20, KD: -15 },
+              consequenceText: lang === "EN" ? "Austerity plan brought short-term liquidity but public anger." : "IMF programı döviz sağladı fakat toplumsal tepki çekti.",
               text: lang === "EN" ? "Sign emergency IMF austerity standby agreement." : "IMF ile acil standby anlaşması imzalayıp devalüasyon yapın.",
               impact: { TP: +20, KP: -10, PID: -5, GB: -10, OH: -20, KD: -15 },
               logMessage: lang === "EN" ? "Austerity plan brought short-term liquidity but public anger." : "IMF programı döviz sağladı fakat toplumsal tepki çekti.",
             },
             {
               id: "opt_3",
+              label: lang === "EN" ? "Mobilize grassroots solidarity distribution networks." : "Sendikalar ve yerel kooperatiflerle dayanışma dağıtım ağı kurun.",
+              description: lang === "EN" ? "Bypass market monopolies with cooperative networks." : "Piyasa karaborsasını kooperatif dağıtım hatlarıyla aşın.",
+              stateDelta: { TP: +15, KP: -20, PID: +20, GB: -5, OH: +15, KD: +5 },
+              consequenceText: lang === "EN" ? "Grassroots networks reduced oligarchic market exploitation." : "Halk kooperatifleri oligarşik rantı geriletti.",
               text: lang === "EN" ? "Mobilize grassroots solidarity distribution networks." : "Sendikalar ve yerel kooperatiflerle dayanışma dağıtım ağı kurun.",
               impact: { TP: +15, KP: -20, PID: +20, GB: -5, OH: +15, KD: +5 },
               logMessage: lang === "EN" ? "Grassroots networks reduced oligarchic market exploitation." : "Halk kooperatifleri oligarşik rantı geriletti.",
@@ -231,12 +243,20 @@ app.post("/api/historical-scenarios", async (req, res) => {
           options: [
             {
               id: "opt_1",
+              label: lang === "EN" ? "Implement full privatization and export-led growth deregulation." : "İhracata dayalı büyüme modelini pazarlıksız uygulayın.",
+              description: lang === "EN" ? "Open capital markets completely." : "Sermaye piyasalarını tam serbestleştirmeye açın.",
+              stateDelta: { TP: +25, KP: +20, PID: -15, GB: +10, OH: +10, KD: -10 },
+              consequenceText: lang === "EN" ? "Deregulation attracted foreign funds but expanded oligarchic holding monopolies." : "Deregülasyon holding sermayesini ihya etti.",
               text: lang === "EN" ? "Implement full privatization and export-led growth deregulation." : "İhracata dayalı büyüme modelini pazarlıksız uygulayın.",
               impact: { TP: +25, KP: +20, PID: -15, GB: +10, OH: +10, KD: -10 },
               logMessage: lang === "EN" ? "Deregulation attracted foreign funds but expanded oligarchic holding monopolies." : "Deregülasyon holding sermayesini ihya etti.",
             },
             {
               id: "opt_2",
+              label: lang === "EN" ? "Negotiate safeguards for national industries with the junta council." : "Milli sanayiyi koruyacak yerli teşvik maddeleri ekletin.",
+              description: lang === "EN" ? "Maintain selective industrial protections." : "Seçici yerli sanayi koruma kalkanlarını sürdürün.",
+              stateDelta: { TP: +10, KP: -10, PID: +10, GB: -10, OH: -5, KD: +5 },
+              consequenceText: lang === "EN" ? "National safeguards mitigated total industrial takeover." : "Milli teşvikler sanayi çöküşünü frenledi.",
               text: lang === "EN" ? "Negotiate safeguards for national industries with the junta council." : "Milli sanayiyi koruyacak yerli teşvik maddeleri ekletin.",
               impact: { TP: +10, KP: -10, PID: +10, GB: -10, OH: -5, KD: +5 },
               logMessage: lang === "EN" ? "National safeguards mitigated total industrial takeover." : "Milli teşvikler sanayi çöküşünü frenledi.",
@@ -264,12 +284,20 @@ app.post("/api/historical-scenarios", async (req, res) => {
           options: [
             {
               id: "opt_1",
+              label: lang === "EN" ? "Seize insolvent banks under TMSF state audit council." : "TMSF el koyma kararıyla batan bankalara el koyup varlıklarına el koyun.",
+              description: lang === "EN" ? "Confiscate assets of corrupt bank owners." : "Hortumcu banka sahiplerinin varlıklarına kamu el koysun.",
+              stateDelta: { TP: +20, KP: -25, PID: +10, GB: +15, OH: +15, KD: -15 },
+              consequenceText: lang === "EN" ? "TMSF intervention dealt a heavy blow to offshore capital rings." : "TMSF operasyonu kirli sermayeyi geriletti.",
               text: lang === "EN" ? "Seize insolvent banks under TMSF state audit council." : "TMSF el koyma kararıyla batan bankalara el koyup varlıklarına el koyun.",
               impact: { TP: +20, KP: -25, PID: +10, GB: +15, OH: +15, KD: -15 },
               logMessage: lang === "EN" ? "TMSF intervention dealt a heavy blow to offshore capital rings." : "TMSF operasyonu kirli sermayeyi geriletti.",
             },
             {
               id: "opt_2",
+              label: lang === "EN" ? "Bailout bank owners to preserve financial system confidence." : "Sistemik çöküşü önlemek için banka sahiplerine borç yapılandırması verin.",
+              description: lang === "EN" ? "Absorb financial debts through state treasury guarantees." : "Mali borçları hazine garantisine alarak sistem çöküşünü önleyin.",
+              stateDelta: { TP: -20, KP: +30, PID: -15, GB: -10, OH: -10, KD: +20 },
+              consequenceText: lang === "EN" ? "Bailout deepened public deficit and oligarchic impunity." : "Kurtarma paketi kamu zararlarını tırmandırdı.",
               text: lang === "EN" ? "Bailout bank owners to preserve financial system confidence." : "Sistemik çöküşü önlemek için banka sahiplerine borç yapılandırması verin.",
               impact: { TP: -20, KP: +30, PID: -15, GB: -10, OH: -10, KD: +20 },
               logMessage: lang === "EN" ? "Bailout deepened public deficit and oligarchic impunity." : "Kurtarma paketi kamu zararlarını tırmandırdı.",
@@ -297,12 +325,20 @@ app.post("/api/historical-scenarios", async (req, res) => {
           options: [
             {
               id: "opt_1",
+              label: lang === "EN" ? "Appoint independent technocrat minister and pass Kemal Derviş reforms." : "Bağımsız teknokrat bakan atayıp Güçlü Ekonomiye Geçiş Programı ilan edin.",
+              description: lang === "EN" ? "Implement strict fiscal discipline and central bank independence." : "Merkez bankası bağımsızlığı ve sıkı mali disiplin uygulayın.",
+              stateDelta: { TP: +25, KP: -15, PID: -5, GB: +20, OH: +10, KD: -35 },
+              consequenceText: lang === "EN" ? "Technocratic reform stabilized currency but reduced political autonomy." : "Teknokrat reform kuru dizginledi fakat idari vesayeti artırdı.",
               text: lang === "EN" ? "Appoint independent technocrat minister and pass Kemal Derviş reforms." : "Bağımsız teknokrat bakan atayıp Güçlü Ekonomiye Geçiş Programı ilan edin.",
               impact: { TP: +25, KP: -15, PID: -5, GB: +20, OH: +10, KD: -35 },
               logMessage: lang === "EN" ? "Technocratic reform stabilized currency but reduced political autonomy." : "Teknokrat reform kuru dizginledi fakat idari vesayeti artırdı.",
             },
             {
               id: "opt_2",
+              label: lang === "EN" ? "Reject foreign dictates and impose emergency capital controls." : "Sermaye hareketlerini kısıtlayıp yerli kriz masası oluşturun.",
+              description: lang === "EN" ? "Restrict foreign exchange outflow and fix rates artificially." : "Döviz çıkışlarını kısıtlayıp kuru sabitleyin.",
+              stateDelta: { TP: -10, KP: -10, PID: +15, GB: -15, OH: -15, KD: +10 },
+              consequenceText: lang === "EN" ? "Capital controls slowed panic but isolated external credit." : "Sermaye kısıtı paniği yatıştırdı fakat kredi kanallarını daralttı.",
               text: lang === "EN" ? "Reject foreign dictates and impose emergency capital controls." : "Sermaye hareketlerini kısıtlayıp yerli kriz masası oluşturun.",
               impact: { TP: -10, KP: -10, PID: +15, GB: -15, OH: -15, KD: +10 },
               logMessage: lang === "EN" ? "Capital controls slowed panic but isolated external credit." : "Sermaye kısıtı paniği yatıştırdı fakat kredi kanallarını daralttı.",
@@ -330,12 +366,20 @@ app.post("/api/historical-scenarios", async (req, res) => {
           options: [
             {
               id: "opt_1",
+              label: lang === "EN" ? "Deploy public liquidity guarantees and tax credit incentives." : "Kredi Garanti Fonu ve vergi indirim paketi açıklayın.",
+              description: lang === "EN" ? "Support exporters and industrial manufacturers with credit funds." : "İhracatçı ve imalatçı sanayiyi kredi garanti kalkanıyla koruyun.",
+              stateDelta: { TP: -10, KP: +10, PID: +5, GB: +10, OH: +15, KD: -10 },
+              consequenceText: lang === "EN" ? "Liquidity guarantees prevented domestic industrial bankruptcies." : "Likidite desteği reel sektör iflaslarını engelledi.",
               text: lang === "EN" ? "Deploy public liquidity guarantees and tax credit incentives." : "Kredi Garanti Fonu ve vergi indirim paketi açıklayın.",
               impact: { TP: -10, KP: +10, PID: +5, GB: +10, OH: +15, KD: -10 },
               logMessage: lang === "EN" ? "Liquidity guarantees prevented domestic industrial bankruptcies." : "Likidite desteği reel sektör iflaslarını engelledi.",
             },
             {
               id: "opt_2",
+              label: lang === "EN" ? "Request preemptive IMF credit line." : "Önleyici IMF ihtiyati akdi imzalayın.",
+              description: lang === "EN" ? "Secure liquidity buffer from international institutions." : "Uluslararası kurumlardan önleyici likidite kalkanı temin edin.",
+              stateDelta: { TP: +20, KP: -15, PID: -10, GB: +10, OH: -10, KD: -15 },
+              consequenceText: lang === "EN" ? "IMF buffer reassured rating agencies." : "IMF rezervi kredi derecelendirme notunu korudu.",
               text: lang === "EN" ? "Request preemptive IMF credit line." : "Önleyici IMF ihtiyati akdi imzalayın.",
               impact: { TP: +20, KP: -15, PID: -10, GB: +10, OH: -10, KD: -15 },
               logMessage: lang === "EN" ? "IMF buffer reassured rating agencies." : "IMF rezervi kredi derecelendirme notunu korudu.",
@@ -401,8 +445,10 @@ app.post("/api/historical-scenarios", async (req, res) => {
                       type: Type.OBJECT,
                       properties: {
                         id: { type: Type.STRING },
-                        text: { type: Type.STRING },
-                        impact: {
+                        label: { type: Type.STRING },
+                        description: { type: Type.STRING },
+                        consequenceText: { type: Type.STRING },
+                        stateDelta: {
                           type: Type.OBJECT,
                           properties: {
                             TP: { type: Type.INTEGER },
@@ -413,9 +459,8 @@ app.post("/api/historical-scenarios", async (req, res) => {
                             KD: { type: Type.INTEGER },
                           },
                         },
-                        logMessage: { type: Type.STRING },
                       },
-                      required: ["id", "text", "impact", "logMessage"],
+                      required: ["id", "label", "description", "consequenceText", "stateDelta"],
                     },
                   },
                 },

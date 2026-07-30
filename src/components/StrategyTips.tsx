@@ -183,7 +183,7 @@ export const StrategyTips: React.FC = () => {
                     {language === 'EN' ? 'CRITICAL RISK WATCHLIST:' : 'KRİTİK RİSK TAKİP LİSTESİ:'}
                   </div>
                   <ul className="space-y-1 text-[11px] text-slate-300">
-                    {tipData.keyRisks.map((risk, idx) => (
+                    {(tipData.keyRisks || []).map((risk, idx) => (
                       <li key={idx} className="flex items-start gap-1.5 font-sans">
                         <span className="text-amber-500 font-mono font-bold">&gt;</span>
                         <span>{risk}</span>

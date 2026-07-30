@@ -419,7 +419,7 @@ export function getTranslatedCard(card: any, lang: Language): any {
       title: `State Reason & Will Trial (Phase ${card.phase})`,
       source: 'National Security & Strategy Board',
       narrative: 'The nation stands at a critical juncture. Radical decisions are expected to align security networks and executive bureaucracy.',
-      options: card.options.map((opt: any, idx: number) => ({
+      options: (card.options || []).map((opt: any, idx: number) => ({
         ...opt,
         label: idx === 0 ? 'Mobilize National Resources & Increase Transparency' : 'Strengthen Bureaucracy & Centralized Command',
         description: idx === 0 ? 'Inspire grassroots trust and reinforce public oversight.' : 'Fortify state memory and establish rapid decision mechanism.',
@@ -433,7 +433,7 @@ export function getTranslatedCard(card: any, lang: Language): any {
     title: translation.titleEn,
     narrative: translation.narrativeEn,
     source: translation.sourceEn,
-    options: card.options.map((opt: any) => {
+    options: (card.options || []).map((opt: any) => {
       const optTrans = translation.optionsEn.find((o) => o.id === opt.id);
       if (!optTrans) return opt;
       return {
