@@ -28,6 +28,8 @@ export const StrategyTips: React.FC = () => {
       soundEngine.playUI('SELECT');
     }
 
+    const isEn = language === 'EN';
+
     try {
       const response = await fetch('/api/strategy-tips', {
         method: 'POST',
@@ -54,9 +56,58 @@ export const StrategyTips: React.FC = () => {
       } else {
         throw new Error(data.error || 'Failed to fetch strategy tips');
       }
-    } catch (err: any) {
-      console.error('Error fetching strategy tip:', err);
-      setError(language === 'EN' ? 'Unable to connect to AI Strategy Advisor' : 'Yapay Zeka Strateji Danışmanına bağlanılamadı');
+    } catch {
+      // Heuristic fallback (Static GitHub Pages resilience)
+      const tp = stateVector.TP ?? 50;
+      const kp = stateVector.KP ?? 40;
+      const pid = stateVector.PID ?? 60;
+      const gb = stateVector.GB ?? 40;
+      const kd = stateVector.KD ?? 30;
+
+      let headline = isEn ? 'STRATEGIC EQUILIBRIUM POSTURE' : 'STRATEJİK DENGELENME POZİSYONU';
+      let rec = isEn
+        ? 'Maintain balance between Grassroots Funds and Shadow Bureaucracy while keeping Currency Volatility controlled.'
+        : 'Temiz Para rezervlerini korurken Gölge Bürokrasi ve Kur Dağınıklığı arasındaki hassas dengeyi muhafaza edin.';
+      let focus = 'TP';
+      const keyRisks: string[] = [];
+
+      if (tp <= 20) {
+        headline = isEn ? 'CRITICAL ALERT: CLEAN CAPITAL DEPLETION' : 'KRİTİK UYARI: TEMİZ PARA TÜKENMEK ÜZERE';
+        rec = isEn
+          ? 'Your grassroots capital is dangerously low. Prioritize directives that generate TP or lower expenses immediately.'
+          : 'Temiz Para rezervleriniz tükenme eşiğinde. Acilen TP artıran ve maliyeti düşüren kararları önceliklendirin.';
+        focus = 'TP';
+        keyRisks.push(isEn ? 'Imminent insolvency collapse' : 'Finansal çöküş riski yüksek');
+      } else if (kd >= 70) {
+        headline = isEn ? 'HIGH VOLATILITY: CURRENCY SHOCK THREAT' : 'YÜKSEK RİSK: KUR ŞOKU SIKILAŞMASI';
+        rec = isEn
+          ? 'Currency volatility is escalating. Avoid high-risk financial decisions and stabilize market expectations.'
+          : 'Kur dağınıklığı kritik seviyelerde. Piyasayı sarsacak yüksek riskli kararlardan kaçının.';
+        focus = 'KD';
+        keyRisks.push(isEn ? 'Market shock threshold approaching' : 'Piyasa kilitlenme riski artıyor');
+      } else if (gb <= 20) {
+        headline = isEn ? 'INSTITUTIONAL RISK: BUREAUCRACY EROSION' : 'KURUMSAL RİSK: BÜROKRATİK ERİME';
+        rec = isEn
+          ? 'Shadow Bureaucracy memory is fading. Strengthen institutional state apparatus before administrative collapse.'
+          : 'Gölge Bürokrasi hafızası zayıflıyor. Devlet aygıtını destekleyecek idari adımlara odaklanın.';
+        focus = 'GB';
+        keyRisks.push(isEn ? 'Deep state memory loss' : 'Devlet yönetilemez hale gelebilir');
+      } else if (kp >= 75 && pid <= 25) {
+        headline = isEn ? 'OLIGARCHY RISK: DARK CAPITAL INFILTRATION' : 'OLİGARŞİ TEHDİDİ: KİRLİ PARA VESAYETİ';
+        rec = isEn
+          ? 'Dark capital dominance threatens internal party democracy. Reinforce PID to prevent oligarchic takeover.'
+          : 'Kirli Para parti içi demokrasiyi esir alma noktasında. PID metriğini yükseltecek demokratik hamleler yapın.';
+        focus = 'PID';
+        keyRisks.push(isEn ? 'Oligarchic capture imminent' : 'Parti içi vesayet kilitlenmesi');
+      }
+
+      setTipData({
+        headline,
+        recommendation: rec,
+        keyRisks: keyRisks.length ? keyRisks : [isEn ? 'Maintain strategic equilibrium' : 'Stratejik dengeyi koruyun'],
+        recommendedFocusMetric: focus,
+      });
+      setLastTurnFetched(turn);
     } finally {
       setLoading(false);
     }
@@ -98,12 +149,13 @@ export const StrategyTips: React.FC = () => {
               <h3 className="font-bold text-xs sm:text-sm text-slate-100 tracking-wide flex items-center gap-1.5">
                 {language === 'EN' ? 'STRATEGY ADVISOR' : 'STRATEJİ AKLI DANIŞMANI'}
                 <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/80 flex items-center gap-1 font-mono">
-                  <Sparkles className="w-2.5 h-2.5 text-emerald-400" /> GEMINI AI
+                  <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
+                  {language === 'EN' ? 'HEURISTIC // LIVE' : 'OTONOM // AKTİF'}
                 </span>
               </h3>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block">
-              {language === 'EN' ? 'Contextual AI analysis based on live 6D vector & game status' : 'Canlı 6-boyutlu vektör ve durum verisiyle otonom tavsiye üretici'}
+            <p className="text-[10px] text-slate-400">
+              {language === 'EN' ? 'Real-time tactical intelligence' : 'Anlık taktik durum ve risk değerlendirmesi'}
             </p>
           </div>
         </div>
@@ -111,107 +163,79 @@ export const StrategyTips: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => fetchStrategyTip(true)}
-            disabled={loading}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all text-xs flex items-center gap-1 disabled:opacity-50"
-            title={language === 'EN' ? 'Refresh AI Strategy Tip' : 'AI Strateji Analizini Yenile'}
+            disabled={loading || isGameOver}
+            className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/50 transition-all disabled:opacity-50"
+            title={language === 'EN' ? 'Refresh Briefing' : 'Analizi Yenile'}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-emerald-400' : ''}`} />
-            <span className="text-[10px] hidden sm:inline">{language === 'EN' ? 'Refresh' : 'Yenile'}</span>
           </button>
 
           <button
-            onClick={() => {
-              soundEngine.playUI('HOVER');
-              setIsExpanded(!isExpanded);
-            }}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all text-xs"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-slate-100 transition-all"
+            title={isExpanded ? (language === 'EN' ? 'Collapse' : 'Daralt') : (language === 'EN' ? 'Expand' : 'Genişlet')}
           >
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* Main Content Body */}
+      {/* Main Body */}
       {isExpanded && (
-        <div className="space-y-3 text-xs">
-          {loading ? (
-            <div className="p-6 bg-slate-950/60 rounded-xl border border-slate-800 flex flex-col items-center justify-center text-slate-400 gap-2">
-              <Sparkles className="w-6 h-6 text-emerald-400 animate-spin" />
-              <span className="text-xs text-emerald-400 animate-pulse">
-                {language === 'EN' ? 'Gemini 3.6 Flash evaluating strategic vectors...' : 'Gemini 3.6 Flash stratejik vektörleri analiz ediyor...'}
-              </span>
+        <div className="space-y-3 animate-fadeIn">
+          {error && (
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-red-950/60 border border-red-800 text-red-200 text-xs">
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{error}</span>
             </div>
-          ) : error ? (
-            <div className="p-3.5 bg-red-950/40 border border-red-800/80 rounded-xl text-red-300 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-                <span>{error}</span>
-              </div>
-              <button
-                onClick={() => fetchStrategyTip(true)}
-                className="px-2 py-1 bg-red-900 hover:bg-red-800 text-white rounded text-[10px] font-bold"
-              >
-                {language === 'EN' ? 'Retry' : 'Tekrar Dene'}
-              </button>
-            </div>
-          ) : tipData ? (
+          )}
+
+          {tipData && (
             <>
               {/* Headline Banner */}
-              <div className="p-2.5 bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-500/50 rounded-xl flex items-start gap-2.5 shadow-md">
-                <Lightbulb className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <div className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
-                    {language === 'EN' ? 'STRATEGIC EVALUATION' : 'STRATEJİK DEĞERLENDİRME HEDEFİ'}
-                  </div>
-                  <h4 className="font-bold text-slate-100 text-xs sm:text-sm mt-0.5 leading-snug">
+              <div className="bg-slate-950/80 rounded-xl p-2.5 border border-slate-800/80 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="text-xs font-bold text-amber-300 uppercase tracking-wide">
                     {tipData.headline}
-                  </h4>
+                  </span>
                 </div>
+
+                {tipData.recommendedFocusMetric && (
+                  <div className={`px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 flex items-center gap-1 ${focusMetricInfo.color}`}>
+                    <ArrowUpRight className="w-3 h-3" />
+                    <span>{language === 'EN' ? 'PRIORITY:' : 'ÖNCELİK:'} {tipData.recommendedFocusMetric}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Detailed Tactical Advice */}
-              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-slate-300 leading-relaxed font-sans text-xs sm:text-xs">
+              {/* Tactical Recommendation */}
+              <div className="text-xs text-slate-300 leading-relaxed bg-slate-950/40 p-3 rounded-xl border border-slate-800/50">
                 <p>{tipData.recommendation}</p>
               </div>
 
-              {/* Grid: Key Risks & Recommended Focus Metric */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                {/* Key Risks Column */}
-                <div className="sm:col-span-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 space-y-1.5">
-                  <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3 text-amber-400" />
-                    {language === 'EN' ? 'CRITICAL RISK WATCHLIST:' : 'KRİTİK RİSK TAKİP LİSTESİ:'}
-                  </div>
-                  <ul className="space-y-1 text-[11px] text-slate-300">
-                    {(tipData.keyRisks || []).map((risk, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5 font-sans">
-                        <span className="text-amber-500 font-mono font-bold">&gt;</span>
+              {/* Key Risks Bullets */}
+              {tipData.keyRisks && tipData.keyRisks.length > 0 && (
+                <div className="space-y-1.5">
+                  <span className="text-[10px] text-red-400/90 font-bold tracking-wider uppercase flex items-center gap-1">
+                    <ShieldAlert className="w-3 h-3 text-red-400" />
+                    {language === 'EN' ? 'IMMEDIATE VULNERABILITIES:' : 'ÖNCELİKLİ RİSK NOKTALARI:'}
+                  </span>
+                  <div className="grid grid-cols-1 gap-1 text-[11px]">
+                    {tipData.keyRisks.map((risk, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-1.5 p-1.5 rounded-lg bg-red-950/20 border border-red-900/30 text-red-200"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
                         <span>{risk}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Priority Focus Metric Badge */}
-                <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 flex flex-col justify-between">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    {language === 'EN' ? 'PRIORITY FOCUS:' : 'ÖNCELİKLİ METRİK:'}
-                  </div>
-                  <div className="mt-1">
-                    <Tooltip code={focusKey} position="top">
-                      <div className={`p-2 rounded-lg border text-center font-mono font-bold text-xs flex items-center justify-center gap-1.5 ${focusMetricInfo.color}`}>
-                        <span>{focusKey}</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
                       </div>
-                    </Tooltip>
-                    <div className="text-[10px] text-slate-400 text-center mt-1 font-sans">
-                      {language === 'EN' ? focusMetricInfo.nameEN : focusMetricInfo.nameTR}
-                    </div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              )}
             </>
-          ) : null}
+          )}
         </div>
       )}
     </div>
