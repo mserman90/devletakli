@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { Shield, BookOpen, Scale, Lock, Play, Activity, Cpu, CheckCircle2, AlertOctagon, HelpCircle, Award, Sparkles, ShieldCheck, History } from 'lucide-react';
+import { Shield, BookOpen, Scale, Lock, Play, Activity, Cpu, CheckCircle2, AlertOctagon, HelpCircle, Award, Sparkles, ShieldCheck, History, Languages } from 'lucide-react';
 import { KnowledgeBaseModal } from './KnowledgeBaseModal';
 import { DisclaimerModal } from './DisclaimerModal';
 import { HistoricalScenariosModal } from './HistoricalScenariosModal';
@@ -8,10 +8,12 @@ import { soundEngine } from '../utils/soundEngine';
 import { Tooltip } from './Tooltip';
 
 export const HeroScreen: React.FC = () => {
-  const { hasAcceptedLegalTerms, setHasAcceptedLegalTerms, startGame, language } = useGameStore();
+  const { hasAcceptedLegalTerms, setHasAcceptedLegalTerms, startGame, language, toggleLanguage } = useGameStore();
   const [isKnowledgeBaseOpen, setIsKnowledgeBaseOpen] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [isHistoricalOpen, setIsHistoricalOpen] = useState(false);
+
+  const isEn = language === 'EN';
 
   const handleToggleAgreement = () => {
     soundEngine.playUI('SELECT');
@@ -50,30 +52,40 @@ export const HeroScreen: React.FC = () => {
       <header className="relative z-10 px-4 sm:px-6 py-4 max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-800/80">
         <div className="flex items-center space-x-3">
           <div className="p-2.5 bg-emerald-600 text-slate-950 rounded-xl shadow-lg shadow-emerald-950/50">
-            <Shield className="w-6 h-6" />
+            <Shield className="w-6 h-6 stroke-[2.5]" />
           </div>
           <div>
             <span className="font-bold tracking-widest text-base text-slate-100 flex items-center gap-2 font-mono">
               DEVLET AKLI
               <Tooltip code="PROD">
-                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-emerald-400 border border-emerald-500/40">
-                  v2.5 PROD
+                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+                  <Sparkles className="w-2.5 h-2.5" /> v3.0 PROD
                 </span>
               </Tooltip>
             </span>
-            <span className="text-xs text-slate-400 block">Siyasi Strateji &amp; Müesses Nizam Simülasyonu</span>
+            <span className="text-xs text-slate-400 block font-serif">
+              {isEn ? 'Political Strategy & Deep Statecraft Simulation' : 'Siyasi Strateji & Müesses Nizam Simülasyonu'}
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg bg-slate-900 hover:bg-slate-800 border border-blue-500/60 text-blue-300 transition-all shadow-sm font-mono"
+          >
+            <Languages className="w-3.5 h-3.5" />
+            <span>{isEn ? 'TR' : 'EN'}</span>
+          </button>
+
           <button
             id="hero-btn-historical"
             onClick={handleOpenHistorical}
             className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 hover:bg-slate-800 border border-purple-500/60 text-purple-300 transition-all shadow-sm"
           >
             <History className="w-4 h-4 text-purple-400" />
-            <span className="hidden sm:inline">TARİHSEL SENARYOLAR</span>
-            <span className="sm:hidden">SENARYO</span>
+            <span className="hidden sm:inline">{isEn ? 'HISTORICAL SCENARIOS' : 'TARİHSEL SENARYOLAR'}</span>
+            <span className="sm:hidden">{isEn ? 'SCENARIO' : 'SENARYO'}</span>
           </button>
 
           <button
@@ -82,7 +94,7 @@ export const HeroScreen: React.FC = () => {
             className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 transition-all shadow-sm"
           >
             <BookOpen className="w-4 h-4 text-emerald-400" />
-            <span className="hidden sm:inline">BİLGİ BANKASI / KODLEKS</span>
+            <span className="hidden sm:inline">{isEn ? 'KODLEKS MANUAL' : 'BİLGİ BANKASI / KODLEKS'}</span>
             <span className="sm:hidden">KODLEKS</span>
           </button>
 
@@ -92,7 +104,7 @@ export const HeroScreen: React.FC = () => {
             className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 hover:bg-slate-800 border border-amber-600/50 text-amber-400 transition-all shadow-sm"
           >
             <Scale className="w-4 h-4 text-amber-400" />
-            <span className="hidden sm:inline">YASAL UYARI</span>
+            <span className="hidden sm:inline">{isEn ? 'LEGAL' : 'YASAL UYARI'}</span>
           </button>
         </div>
       </header>
@@ -103,19 +115,21 @@ export const HeroScreen: React.FC = () => {
         {/* Status Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-mono mb-6 shadow-inner">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>SİMÜLASYON MOTORU SENKRONİZE &amp; HAZIR</span>
+          <span>{isEn ? 'SIMULATION CORE v3.0 SYNCHRONIZED & READY' : 'SİMÜLASYON MOTORU v3.0 SENKRONİZE & HAZIR'}</span>
         </div>
 
         {/* Main Title */}
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-100 max-w-4xl leading-tight mb-4">
-          GERÇEK İKTİDAR KİMİN ELİNDE? <br />
+          {isEn ? 'WHO HOLDS THE REAL POWER?' : 'GERÇEK İKTİDAR KİMİN ELİNDE?'} <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">
-            MÜESSES NİZAM SİMÜLASYONU
+            {isEn ? 'STATE REASON & POWER SIMULATION' : 'MÜESSES NİZAM SİMÜLASYONU'}
           </span>
         </h1>
 
         <p className="text-sm md:text-base text-slate-300 max-w-2xl mb-8 leading-relaxed font-sans">
-          Geleneksel siyasetin sahte ikiliklerini aşın. Partinizi ulusal vesayet odaklarının ve küresel finans ağlarının tuzaklarına düşürmeden <strong>tam bağımsız bir halk hareketine</strong> dönüştürün.
+          {isEn
+            ? 'Transcend the false dichotomies of mainstream politics. Guide your party against deep bureaucratic tutelage and global financial traps into a fully sovereign popular movement.'
+            : 'Geleneksel siyasetin sahte ikiliklerini aşın. Partinizi ulusal vesayet odaklarının ve küresel finans ağlarının tuzaklarına düşürmeden tam bağımsız bir halk hareketine dönüştürün.'}
         </p>
 
         {/* Feature Highlights Grid */}
@@ -124,14 +138,15 @@ export const HeroScreen: React.FC = () => {
             <div className="p-2 bg-emerald-950 text-emerald-400 rounded-lg w-fit mb-3 border border-emerald-800/60">
               <Cpu className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">6-Boyutlu Durum Engine</h3>
+            <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">{isEn ? '6D Tactical Vector & Radar' : '6-Boyutlu Durum & Radar'}</h3>
             <div className="text-xs text-slate-400 leading-relaxed space-x-1">
-              <Tooltip code="TP"><span className="text-emerald-400 font-bold hover:underline">Temiz Para (TP)</span></Tooltip>,{' '}
-              <Tooltip code="KP"><span className="text-red-400 font-bold hover:underline">Kirli Para (KP)</span></Tooltip>,{' '}
-              <Tooltip code="PID"><span className="text-blue-400 font-bold hover:underline">Parti İçi Demokrasi (PID)</span></Tooltip>,{' '}
-              <Tooltip code="BÜROKRATİK NÜFUZ"><span className="text-purple-400 font-bold hover:underline">Bürokratik Nüfuz & GB</span></Tooltip>,{' '}
-              <Tooltip code="KAMUOYU HEGEMONYASI"><span className="text-amber-400 font-bold hover:underline">Kamuoyu Hegemonyası & OH</span></Tooltip> ve{' '}
-              <Tooltip code="KD"><span className="text-teal-400 font-bold hover:underline">Kur Dağınıklığı (KD)</span></Tooltip> kaynak matrisi.
+              <Tooltip code="TP"><span className="text-emerald-400 font-bold hover:underline">TP</span></Tooltip>,{' '}
+              <Tooltip code="KP"><span className="text-red-400 font-bold hover:underline">KP</span></Tooltip>,{' '}
+              <Tooltip code="PID"><span className="text-blue-400 font-bold hover:underline">PID</span></Tooltip>,{' '}
+              <Tooltip code="BÜROKRATİK NÜFUZ"><span className="text-purple-400 font-bold hover:underline">GB</span></Tooltip>,{' '}
+              <Tooltip code="KAMUOYU HEGEMONYASI"><span className="text-amber-400 font-bold hover:underline">OH</span></Tooltip> ve{' '}
+              <Tooltip code="KD"><span className="text-teal-400 font-bold hover:underline">KD</span></Tooltip>{' '}
+              {isEn ? 'matrix with live tactical radar.' : 'kaynak matrisi ve taktik radar.'}
             </div>
           </div>
 
@@ -139,9 +154,11 @@ export const HeroScreen: React.FC = () => {
             <div className="p-2 bg-amber-950 text-amber-400 rounded-lg w-fit mb-3 border border-amber-800/60">
               <Activity className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">Tehdit &amp; Sabotaj AI</h3>
+            <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">{isEn ? 'Shadow Cabinet & Decrees' : 'Gölge Kabine & KHK Masası'}</h3>
             <p className="text-xs text-slate-400 leading-normal">
-              Robert Michels ve Thomas Friedman modellerine dayalı otonom krizler ve acil durum sabotaj müdahaleleri.
+              {isEn
+                ? 'Appoint 4 strategic advisors with unique doctrines and enact emergency executive orders.'
+                : '4 stratejik danışmanla pasif kalkanlar kurun ve kriz anlarında olağanüstü kararnameler imzalayın.'}
             </p>
           </div>
 
@@ -149,9 +166,11 @@ export const HeroScreen: React.FC = () => {
             <div className="p-2 bg-purple-950 text-purple-400 rounded-lg w-fit mb-3 border border-purple-800/60">
               <BookOpen className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">Kodleks Teorik Külliyat</h3>
+            <h3 className="text-sm font-bold text-slate-100 font-mono mb-1">{isEn ? 'Deep Historical Scenarios' : 'Zengin Tarihsel Senaryolar'}</h3>
             <p className="text-xs text-slate-400 leading-normal">
-              Weber, Mills ve Kopenhag Okulu akademisine dayanan rehber, matematiksel denklemler ve akademik kaynakça.
+              {isEn
+                ? 'Relive pivotal crises: 1970s oil shocks, 1980s post-coup tutelage, 1990s bank scandals, and 2001 currency collapse.'
+                : '1970\'ler petrol şoku, 1980\'ler vesayet restorasyonu, 1990\'lar banka krizleri ve 2001 devalüasyonunu yönetin.'}
             </p>
           </div>
         </div>
@@ -162,7 +181,10 @@ export const HeroScreen: React.FC = () => {
           <div className="flex items-start gap-3 text-left bg-amber-950/40 p-3.5 rounded-xl border border-amber-800/60">
             <AlertOctagon className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
             <div className="text-xs text-amber-200/90 leading-normal">
-              <strong>Yasal Zorunluluk &amp; Kullanım Koşulu:</strong> Bu yazılım akademik bir kurgusal oyundur. Oyundaki kurumlar, kararlar ve istihbarat akışları tamamen sanal algoritmalardan ibarettir. Gerçek kişi ve kurumlarla ilgisi yoktur.
+              <strong>{isEn ? 'Legal Notice & Terms:' : 'Yasal Zorunluluk & Kullanım Koşulu:'}</strong>{' '}
+              {isEn
+                ? 'This software is an academic fictional simulation. Entities, directives, and scenarios are purely algorithmic and theoretical.'
+                : 'Bu yazılım akademik bir kurgusal oyundur. Oyundaki kurumlar, kararlar ve istihbarat akışları tamamen sanal algoritmalardan ibarettir. Gerçek kişi ve kurumlarla ilgisi yoktur.'}
             </div>
           </div>
 
@@ -183,7 +205,8 @@ export const HeroScreen: React.FC = () => {
               {hasAcceptedLegalTerms && <CheckCircle2 className="w-4 h-4 text-slate-950 stroke-[3]" />}
             </div>
             <span className="text-xs md:text-sm font-medium leading-snug">
-              <strong>Yasal Uyarıyı, Kurgusal Nitelik Beyanını ve Sorumluluk Sınırlarını</strong> okudum, anladım ve kayıtsız şartsız kabul ediyorum.
+              <strong>{isEn ? 'I have read and unconditionally accept the Legal Disclaimer and Fictional Framework.' : 'Yasal Uyarıyı, Kurgusal Nitelik Beyanını ve Sorumluluk Sınırlarını'}</strong>{' '}
+              {!isEn && 'okudum, anladım ve kayıtsız şartsız kabul ediyorum.'}
             </span>
           </label>
 
@@ -202,12 +225,12 @@ export const HeroScreen: React.FC = () => {
               {hasAcceptedLegalTerms ? (
                 <>
                   <ShieldCheck className="w-5 h-5 text-emerald-300" />
-                  <span>SİMÜLASYONU BAŞLAT</span>
+                  <span>{isEn ? 'START SIMULATION' : 'SİMÜLASYONU BAŞLAT'}</span>
                 </>
               ) : (
                 <>
                   <Lock className="w-5 h-5 text-slate-500" />
-                  <span>SİMÜLASYONU BAŞLAT (YASAL ONAY GEREKİR)</span>
+                  <span>{isEn ? 'START (REQUIRES LEGAL ACCEPTANCE)' : 'SİMÜLASYONU BAŞLAT (YASAL ONAY GEREKİR)'}</span>
                 </>
               )}
             </button>
@@ -218,13 +241,13 @@ export const HeroScreen: React.FC = () => {
               className="py-4 px-5 bg-purple-950/80 hover:bg-purple-900/90 text-purple-200 border border-purple-500/60 rounded-xl font-bold font-mono text-xs md:text-sm transition-all flex items-center justify-center gap-2 shadow-xl shadow-purple-950/40 cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
             >
               <History className="w-5 h-5 text-purple-400" />
-              <span>TARİHSEL SENARYO SEÇ (1970-2008)</span>
+              <span>{isEn ? 'HISTORICAL SCENARIOS (1970-2008)' : 'TARİHSEL SENARYO SEÇ (1970-2008)'}</span>
             </button>
           </div>
 
           {!hasAcceptedLegalTerms && (
             <p className="text-[11px] text-amber-400/90 font-mono text-center">
-              * Oyuna doğrudan başlamak için yukarıdaki yasal onay kutusunu işaretlemelisiniz.
+              * {isEn ? 'You must tick the legal acknowledgment box above to enter.' : 'Oyuna doğrudan başlamak için yukarıdaki yasal onay kutusunu işaretlemelisiniz.'}
             </p>
           )}
 
@@ -237,10 +260,10 @@ export const HeroScreen: React.FC = () => {
         <span>© 2026 DEVLET AKLI SİMÜLASYONU // TÜM HAKLARI SAKLIDIR</span>
         <div className="flex items-center gap-4">
           <button onClick={handleOpenKnowledgeBase} className="hover:text-emerald-400 underline transition-all">
-            Kodleks El Kitabı
+            {isEn ? 'Kodleks Manual' : 'Kodleks El Kitabı'}
           </button>
           <button onClick={handleOpenDisclaimer} className="hover:text-amber-400 underline transition-all">
-            Yasal Uyarı Metni
+            {isEn ? 'Legal Disclaimer' : 'Yasal Uyarı Metni'}
           </button>
         </div>
       </footer>

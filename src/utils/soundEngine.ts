@@ -1,13 +1,16 @@
 /**
  * SIFIR BAĞIMLILIKLI PROSEDÜREL SES MOTORU
  * Web Audio API kullanılarak osilatörler, ADSR zarfları ve filtrelerle
- * tüm arayüz sesleri, sabotaj sirenleri ve kalp atışı efektleri sentezlenir.
+ * tüm arayüz sesleri, sabotaj sirenleri, doktrin ve kararname efektleri sentezlenir.
  */
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private heartbeatTimer: number | null = null;
+  private ambientOsc: OscillatorNode | null = null;
+  private ambientGain: GainNode | null = null;
   private isMuted: boolean = false;
+  private isAmbientPlaying: boolean = false;
 
   constructor() {
     // Lazily initialized on user interaction
@@ -31,6 +34,7 @@ class SoundEngine {
     this.isMuted = muted;
     if (muted) {
       this.stopHeartbeat();
+      this.stopAmbient();
     }
   }
 
@@ -41,7 +45,7 @@ class SoundEngine {
   /**
    * UI Ses Efektleri Sentezleyici
    */
-  public playUI(type: 'SELECT' | 'HOVER' | 'CONFIRM' | 'VICTORY' | 'DEFEAT'): void {
+  public playUI(type: 'SELECT' | 'HOVER' | 'CONFIRM' | 'VICTORY' | 'DEFEAT' | 'DOCTRINE' | 'DECREE'): void {
     const ctx = this.initCtx();
     if (!ctx || this.isMuted) return;
 
@@ -101,6 +105,51 @@ class SoundEngine {
         break;
       }
 
+      case 'DOCTRINE': {
+        // Taktik Danışman Doktrini Telsiz ve Synth Sesi
+        [329.63, 392.00, 493.88, 659.25].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + idx * 0.08 + 0.2);
+
+          gain.gain.setValueAtTime(0.08, now + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 0.25);
+        });
+        break;
+      }
+
+      case 'DECREE': {
+        // Ağır Resmi Mühür & Kararname Vuruş Efekti
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.35);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(300, now);
+        filter.frequency.exponentialRampToValueAtTime(80, now + 0.35);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.4);
+        break;
+      }
+
       case 'VICTORY': {
         // Triumphant majör akor arpej
         const freqs = [440, 554.37, 659.25, 880, 1108.73];
@@ -157,17 +206,20 @@ class SoundEngine {
 
     osc.type = 'sawtooth';
     lfo.type = 'sine';
-    lfo.frequency.setValueAtTime(4, now); // 4 Hz siren frekansı
+    lfo.frequency.setValueAtTime(4, now);
 
-    lfoGain.gain.setValueAtTime(300, now); // Pitch deviasyonu
-    lfo.connect(osc.frequency);
-    osc.frequency.setValueAtTime(600, now);
+    lfoGain.gain.setValueAtTime(180, now);
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
 
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(1200, now);
+    osc.frequency.setValueAtTime(450, now);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(900, now);
+    filter.Q.setValueAtTime(3, now);
 
     mainGain.gain.setValueAtTime(0.18, now);
-    mainGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+    mainGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
 
     osc.connect(filter);
     filter.connect(mainGain);
@@ -175,18 +227,16 @@ class SoundEngine {
 
     lfo.start(now);
     osc.start(now);
-
-    lfo.stop(now + 1.8);
-    osc.stop(now + 1.8);
+    lfo.stop(now + 2.5);
+    osc.stop(now + 2.5);
   }
 
   /**
-   * BPM Uyarlamalı Kalp Atışı Efekti (BPM-driven "lub-dub")
+   * Kalp Atışı Efekti (Nabız / Panik)
    */
   public startHeartbeat(bpm = 120): void {
     this.stopHeartbeat();
-    const ctx = this.initCtx();
-    if (!ctx || this.isMuted) return;
+    if (this.isMuted) return;
 
     const intervalMs = (60 / bpm) * 1000;
 
@@ -250,6 +300,70 @@ class SoundEngine {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
+  }
+
+  /**
+   * Taktik Sevk Masası Ambiyans Dronu
+   */
+  public toggleAmbient(): boolean {
+    if (this.isAmbientPlaying) {
+      this.stopAmbient();
+      return false;
+    } else {
+      this.startAmbient();
+      return true;
+    }
+  }
+
+  public startAmbient(): void {
+    if (this.isMuted) return;
+    const ctx = this.initCtx();
+    if (!ctx) return;
+
+    this.stopAmbient();
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(55, now); // Low A1
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(140, now);
+
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.02, now + 2); // very subtle atmospheric background
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    this.ambientOsc = osc;
+    this.ambientGain = gain;
+    this.isAmbientPlaying = true;
+  }
+
+  public stopAmbient(): void {
+    if (this.ambientOsc && this.ambientGain && this.ctx) {
+      const now = this.ctx.currentTime;
+      this.ambientGain.gain.linearRampToValueAtTime(0.0001, now + 0.8);
+      setTimeout(() => {
+        try {
+          this.ambientOsc?.stop();
+          this.ambientOsc?.disconnect();
+        } catch {}
+        this.ambientOsc = null;
+        this.ambientGain = null;
+      }, 900);
+    }
+    this.isAmbientPlaying = false;
+  }
+
+  public getIsAmbientPlaying(): boolean {
+    return this.isAmbientPlaying;
   }
 }
 

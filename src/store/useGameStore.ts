@@ -1,9 +1,21 @@
 import { create } from 'zustand';
-import { StateVector, DecisionCard, GameLog, IntelligenceFeedItem, ApiRateLimitStatus, ToastNotification } from '../types/game';
-import { processTurn } from '../core/simulationEngine';
+import {
+  StateVector,
+  DecisionCard,
+  GameLog,
+  IntelligenceFeedItem,
+  ApiRateLimitStatus,
+  ToastNotification,
+  Advisor,
+  EmergencyDecree,
+  PastRunRecord,
+} from '../types/game';
+import { processTurn, clamp, AdvisorModifiers } from '../core/simulationEngine';
 import { adversarialAIEngine } from '../core/adversarialAIEngine';
 import { intelligenceService } from '../services/intelligenceService';
 import { INITIAL_CARDS } from '../data/initialCards';
+import { INITIAL_ADVISORS, INITIAL_DECREES } from '../data/cabinetAndDecrees';
+import { generateProceduralCard } from '../core/proceduralCardEngine';
 import { soundEngine } from '../utils/soundEngine';
 
 interface GameState {
@@ -21,15 +33,24 @@ interface GameState {
   gameOverReason: 'VICTORY' | 'OBLITERATED' | 'AUTOCRACY_DEFEAT' | 'BANKRUPT_DEFEAT' | 'DEEP_STATE_DEFEAT' | null;
   isInterruptActive: boolean;
   isSoundMuted: boolean;
+  isAmbientPlaying: boolean;
   hasStartedGame: boolean;
   hasAcceptedLegalTerms: boolean;
   language: 'TR' | 'EN';
 
+  // Kabine ve Kararnameler
+  advisors: Advisor[];
+  decrees: EmergencyDecree[];
+  pastRuns: PastRunRecord[];
+
   // Eylemler
   selectOption: (optionId: string) => void;
+  activateAdvisorDoctrine: (advisorId: string) => void;
+  enactEmergencyDecree: (decreeId: string) => void;
   fetchIntelligence: () => Promise<void>;
   resetGame: () => void;
   toggleSound: () => void;
+  toggleAmbient: () => void;
   toggleLanguage: () => void;
   startGame: () => void;
   setHasAcceptedLegalTerms: (accepted: boolean) => void;
@@ -37,6 +58,10 @@ interface GameState {
   addToast: (toast: Omit<ToastNotification, 'id' | 'timestamp'> & { id?: string }) => void;
   removeToast: (id: string) => void;
   clearToasts: () => void;
+  saveGameToStorage: () => void;
+  loadGameFromStorage: () => boolean;
+  exportStateToJson: () => string;
+  importStateFromJson: (jsonStr: string) => boolean;
   loadHistoricalScenario: (scenarioData: {
     stateVector: StateVector;
     initialCard: DecisionCard;
@@ -55,6 +80,63 @@ const INITIAL_VECTOR: StateVector = {
   OH: 45, // Overton Hegemonyası
   KD: 30, // Kur Dağınıklığı
 };
+
+const STORAGE_KEY_SAVE = 'devletakli_savegame_v2';
+const STORAGE_KEY_PAST_RUNS = 'devletakli_past_runs_v2';
+
+function loadPastRunsFromStorage(): PastRunRecord[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PAST_RUNS);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    console.warn('Past runs could not be loaded:', e);
+  }
+  return [];
+}
+
+function calculateGradeAndArchetype(
+  state: StateVector,
+  turn: number,
+  reason: GameState['gameOverReason'],
+  lang: 'TR' | 'EN'
+) {
+  let grade = 'B';
+  if (reason === 'VICTORY') {
+    grade = state.TP >= 70 && state.KD <= 35 ? 'A+' : 'A';
+  } else if (turn >= 18) {
+    grade = 'B+';
+  } else if (turn >= 12) {
+    grade = 'B';
+  } else if (turn >= 6) {
+    grade = 'C';
+  } else {
+    grade = 'F';
+  }
+
+  let archetype = lang === 'EN' ? 'Prudent Strategist' : 'İhtiyatlı Denge Stratejisti';
+  let archetypeEN = 'Prudent Equilibrium Strategist';
+
+  if (state.TP >= 65 && state.PID >= 60) {
+    archetype = lang === 'EN' ? 'Grassroots Sovereign Democrat' : 'Demokratik Halk Egemeni';
+    archetypeEN = 'Grassroots Sovereign Democrat';
+  } else if (state.GB >= 65) {
+    archetype = lang === 'EN' ? 'Technocratic Institutionalist' : 'Teknokratik Restorasyoncu';
+    archetypeEN = 'Technocratic Institutionalist';
+  } else if (state.OH >= 65) {
+    archetype = lang === 'EN' ? 'Media Hegemon' : 'Söylem ve Kamuoyu Lideri';
+    archetypeEN = 'Media Hegemon';
+  } else if (state.KP >= 65) {
+    archetype = lang === 'EN' ? 'Oligarchic Negotiator' : 'Holding ve Sermaye Dengecisi';
+    archetypeEN = 'Oligarchic Negotiator';
+  } else if (state.KD >= 75) {
+    archetype = lang === 'EN' ? 'Market Shock Casualty' : 'Piyasa Çalkantısı Kurbanı';
+    archetypeEN = 'Market Shock Casualty';
+  }
+
+  return { grade, archetype, archetypeEN };
+}
 
 export const useGameStore = create<GameState>((set, get) => ({
   stateVector: { ...INITIAL_VECTOR },
@@ -79,9 +161,14 @@ export const useGameStore = create<GameState>((set, get) => ({
   gameOverReason: null,
   isInterruptActive: false,
   isSoundMuted: false,
+  isAmbientPlaying: false,
   hasStartedGame: false,
   hasAcceptedLegalTerms: false,
   language: 'TR',
+
+  advisors: JSON.parse(JSON.stringify(INITIAL_ADVISORS)),
+  decrees: JSON.parse(JSON.stringify(INITIAL_DECREES)),
+  pastRuns: loadPastRunsFromStorage(),
 
   addToast: (toast) => {
     const nowTime = new Date().toLocaleTimeString('tr-TR');
@@ -98,7 +185,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
 
     set((state) => ({
-      toasts: [newToast, ...state.toasts].slice(0, 5), // Maximum 5 toasts at once
+      toasts: [newToast, ...state.toasts].slice(0, 5),
     }));
   },
 
@@ -113,19 +200,38 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   selectOption: (optionId: string) => {
-    const { stateVector, turn, activeCard, cardQueue, history, logs, toasts } = get();
+    const { stateVector, turn, activeCard, cardQueue, history, logs, toasts, advisors, decrees, pastRuns, language } = get();
     if (!activeCard) return;
 
     const selectedOption = activeCard.options.find((opt) => opt.id === optionId);
     if (!selectedOption) return;
 
+    // Danışman pasif bonuslarını hesapla
+    const modifiers: AdvisorModifiers = {
+      tpInflationDampener: 0.20, // Dr. Selim Aras
+      pidMichelsDampener: 0.25, // Emine Candan
+      gbProtection: true, // Albay Mete Demir
+      ohProtection: true, // Deniz Yılmaz
+    };
+
     // 1. Simülasyon Çekirdeğinde Tur İşleme ve Otonom Sürüklenme Hesabı
-    const { nextState, drift } = processTurn(stateVector, selectedOption.stateDelta);
+    const { nextState, drift } = processTurn(stateVector, selectedOption.stateDelta, modifiers);
     const nextTurn = turn + 1;
-    const nextPhase = Math.min(4, Math.ceil(nextTurn / 5));
+    const nextPhase = Math.min(4, Math.max(1, Math.ceil(nextTurn / 6)));
 
     // Ses Efekti
     soundEngine.playUI('CONFIRM');
+
+    // Soğuma Sürelerini (Cooldown) İlerlet
+    const updatedAdvisors = advisors.map((adv) => ({
+      ...adv,
+      currentCooldown: Math.max(0, adv.currentCooldown - 1),
+    }));
+
+    const updatedDecrees = decrees.map((dec) => ({
+      ...dec,
+      currentCooldown: Math.max(0, dec.currentCooldown - 1),
+    }));
 
     // Günlük Kaydı (Log) Oluşturma
     const nowTime = new Date().toLocaleTimeString('tr-TR');
@@ -168,7 +274,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       gameOver = true;
       reason = 'DEEP_STATE_DEFEAT';
       soundEngine.playUI('DEFEAT');
-    } else if (nextTurn >= 18 && nextState.TP >= 65 && nextState.PID >= 50 && nextState.GB >= 50 && nextState.OH >= 55 && nextState.KD <= 45) {
+    } else if (
+      nextTurn >= 18 &&
+      nextState.TP >= 65 &&
+      nextState.PID >= 50 &&
+      nextState.GB >= 50 &&
+      nextState.OH >= 55 &&
+      nextState.KD <= 45
+    ) {
       gameOver = true;
       reason = 'VICTORY';
       soundEngine.playUI('VICTORY');
@@ -260,9 +373,32 @@ export const useGameStore = create<GameState>((set, get) => ({
         autoCloseMs: 8000,
       });
 
+      // Geçmiş İktidar Siciline Kaydet
+      const { grade, archetype, archetypeEN } = calculateGradeAndArchetype(nextState, nextTurn, reason, language);
+      const newPastRun: PastRunRecord = {
+        id: `run_${Date.now()}`,
+        date: new Date().toLocaleDateString('tr-TR'),
+        turn: nextTurn,
+        outcome: reason || 'OBLITERATED',
+        finalState: nextState,
+        grade,
+        archetype,
+        archetypeEN,
+      };
+
+      const updatedPastRuns = [newPastRun, ...pastRuns].slice(0, 15);
+      try {
+        localStorage.setItem(STORAGE_KEY_PAST_RUNS, JSON.stringify(updatedPastRuns));
+      } catch (err) {
+        console.warn('Past runs save error:', err);
+      }
+
       set({
         stateVector: nextState,
         turn: nextTurn,
+        advisors: updatedAdvisors,
+        decrees: updatedDecrees,
+        pastRuns: updatedPastRuns,
         history: [...history, { turn: nextTurn, state: nextState, decisionTitle: activeCard.title }],
         logs: [
           ...newLogs,
@@ -271,7 +407,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             timestamp: nowTime,
             turn: nextTurn,
             type: 'SYSTEM',
-            message: `[OYUN SONU] Simülasyon Tamamlandı. Sonuç: ${reason}`,
+            message: `[OYUN SONU] Simülasyon Tamamlandı. Sonuç: ${reason} - Not: ${grade} (${archetype})`,
           },
         ],
         toasts: generatedToasts.slice(0, 5),
@@ -283,7 +419,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     // 3. Tehdit Motoru (Adversarial AI Engine) Değerlendirmesi
-    const threatCard = adversarialAIEngine.evaluateThreats(nextState, nextTurn);
+    const threatCard = adversarialAIEngine.evaluateThreats(nextState, nextTurn, true);
 
     let nextActiveCard: DecisionCard | null = null;
     let nextQueue = [...cardQueue];
@@ -323,52 +459,234 @@ export const useGameStore = create<GameState>((set, get) => ({
         nextActiveCard = nextQueue[0];
         nextQueue = nextQueue.slice(1);
       } else {
-        // Döngüsel Kart Haznesi veya Faz Kartları Bittiğinde Yeni Kart Üretimi
-        const fallbackCard: DecisionCard = {
-          id: `card_gen_${nextTurn}`,
-          title: `Devlet Aklı ve İrade Sınavı (Faz ${nextPhase})`,
-          phase: nextPhase,
-          category: 'POLITICS',
-          source: 'Ulusal Güvenlik ve Strateji Kurulu',
-          narrative: 'Ülke kritik bir dönemeçten geçiyor. Teşkilatların ve bürokrasinin uyumu için radikal bir karar alınması bekleniyor.',
-          options: [
-            {
-              id: `opt_gen_${nextTurn}_1`,
-              label: 'Ulusal Kaynakları Seferber Et ve Şeffaflığı Artır',
-              description: 'Tabana güven ver, kamu denetimini güçlendir.',
-              stateDelta: { TP: +10, PID: +10, KD: -5 },
-              riskFactor: 15,
-              consequenceText: 'Taban desteği ve kamu şeffaflığı arttı.',
-            },
-            {
-              id: `opt_gen_${nextTurn}_2`,
-              label: 'Bürokrasi ve Merkezleşmeyi Güçlendir',
-              description: 'Devlet hafızasını tahkim et, hızlı karar mekanizması kur.',
-              stateDelta: { GB: +15, KP: +10, PID: -10 },
-              riskFactor: 25,
-              consequenceText: 'İdari mekanizma hızlandı ancak vesayet riski arttı.',
-            },
-          ],
-        };
-        nextActiveCard = fallbackCard;
+        // Kart destesi bittiğinde PROSEDÜREL DİNAMİK KART MOTORU DEVREYE GİRER
+        nextActiveCard = generateProceduralCard(nextState, nextTurn, language);
       }
     }
+
+    // Otomatik Durum Kaydı (Auto-Save)
+    const newStateData = {
+      stateVector: nextState,
+      turn: nextTurn,
+      phase: nextPhase,
+      advisors: updatedAdvisors,
+      decrees: updatedDecrees,
+      history: [...history, { turn: nextTurn, state: nextState, decisionTitle: activeCard.title }],
+      logs: newLogs,
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY_SAVE, JSON.stringify(newStateData));
+    } catch {}
 
     set({
       stateVector: nextState,
       turn: nextTurn,
       phase: nextPhase,
+      advisors: updatedAdvisors,
+      decrees: updatedDecrees,
       activeCard: nextActiveCard,
       cardQueue: nextQueue,
-      history: [...history, { turn: nextTurn, state: nextState, decisionTitle: activeCard.title }],
+      history: newStateData.history,
       logs: newLogs,
       toasts: generatedToasts.slice(0, 5),
       isInterruptActive: isInterrupt,
     });
   },
 
+  activateAdvisorDoctrine: (advisorId: string) => {
+    const { advisors, stateVector, turn, logs, language } = get();
+    const advisor = advisors.find((a) => a.id === advisorId);
+    if (!advisor || advisor.currentCooldown > 0) return;
+
+    soundEngine.playUI('DOCTRINE');
+
+    const nextState: StateVector = {
+      TP: clamp(stateVector.TP + (advisor.doctrineImpact.TP || 0)),
+      KP: clamp(stateVector.KP + (advisor.doctrineImpact.KP || 0)),
+      PID: clamp(stateVector.PID + (advisor.doctrineImpact.PID || 0)),
+      GB: clamp(stateVector.GB + (advisor.doctrineImpact.GB || 0)),
+      OH: clamp(stateVector.OH + (advisor.doctrineImpact.OH || 0)),
+      KD: clamp(stateVector.KD + (advisor.doctrineImpact.KD || 0)),
+    };
+
+    const updatedAdvisors = advisors.map((a) =>
+      a.id === advisorId ? { ...a, currentCooldown: a.cooldownMax } : a
+    );
+
+    const nowTime = new Date().toLocaleTimeString('tr-TR');
+    const docTitle = language === 'EN' ? advisor.doctrineTitleEN : advisor.doctrineTitle;
+
+    const newLogs: GameLog[] = [
+      ...logs,
+      {
+        id: `log_adv_${Date.now()}`,
+        timestamp: nowTime,
+        turn,
+        type: 'ADVISOR',
+        message: `[DANIŞMAN DOKTRİNİ] ${advisor.name} -> "${docTitle}" devreye sokuldu!`,
+        impact: language === 'EN' ? advisor.doctrineDescEN : advisor.doctrineDesc,
+      },
+    ];
+
+    get().addToast({
+      type: 'SUCCESS',
+      title: language === 'EN' ? 'ADVISOR DOCTRINE ENACTED' : 'DANIŞMAN DOKTRİNİ İCRA EDİLDİ',
+      message: `${advisor.name}: "${docTitle}"`,
+      autoCloseMs: 5000,
+    });
+
+    set({
+      stateVector: nextState,
+      advisors: updatedAdvisors,
+      logs: newLogs,
+    });
+  },
+
+  enactEmergencyDecree: (decreeId: string) => {
+    const { decrees, stateVector, turn, logs, language } = get();
+    const decree = decrees.find((d) => d.id === decreeId);
+    if (!decree || decree.currentCooldown > 0) return;
+
+    soundEngine.playUI('DECREE');
+
+    const nextState: StateVector = {
+      TP: clamp(stateVector.TP + (decree.stateDelta.TP || 0)),
+      KP: clamp(stateVector.KP + (decree.stateDelta.KP || 0)),
+      PID: clamp(stateVector.PID + (decree.stateDelta.PID || 0)),
+      GB: clamp(stateVector.GB + (decree.stateDelta.GB || 0)),
+      OH: clamp(stateVector.OH + (decree.stateDelta.OH || 0)),
+      KD: clamp(stateVector.KD + (decree.stateDelta.KD || 0)),
+    };
+
+    const updatedDecrees = decrees.map((d) =>
+      d.id === decreeId ? { ...d, currentCooldown: d.cooldownMax } : d
+    );
+
+    const nowTime = new Date().toLocaleTimeString('tr-TR');
+    const decreeTitle = language === 'EN' ? decree.titleEN : decree.title;
+
+    const newLogs: GameLog[] = [
+      ...logs,
+      {
+        id: `log_decree_${Date.now()}`,
+        timestamp: nowTime,
+        turn,
+        type: 'DECREE',
+        message: `[OLAĞANÜSTÜ KARARNAME] "${decreeTitle}" yürürlüğe girdi.`,
+        impact: language === 'EN' ? decree.descriptionEN : decree.description,
+      },
+    ];
+
+    get().addToast({
+      type: 'WARNING',
+      title: language === 'EN' ? 'EMERGENCY DECREE ENACTED' : 'OLAĞANÜSTÜ KARARNAME YÜRÜRLÜKTE',
+      message: `"${decreeTitle}"`,
+      autoCloseMs: 5000,
+    });
+
+    set({
+      stateVector: nextState,
+      decrees: updatedDecrees,
+      logs: newLogs,
+    });
+  },
+
+  saveGameToStorage: () => {
+    const { stateVector, turn, phase, activeCard, cardQueue, history, logs, advisors, decrees, language } = get();
+    const saveData = {
+      stateVector,
+      turn,
+      phase,
+      activeCard,
+      cardQueue,
+      history,
+      logs,
+      advisors,
+      decrees,
+      savedAt: new Date().toISOString(),
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY_SAVE, JSON.stringify(saveData));
+      soundEngine.playUI('CONFIRM');
+      get().addToast({
+        type: 'SUCCESS',
+        title: language === 'EN' ? 'SIMULATION SAVED' : 'SİMÜLASYON KAYDEDİLDİ',
+        message: language === 'EN' ? `State saved at Turn #${turn}` : `Tur #${turn} itibarıyla durum hafızaya kaydedildi.`,
+        autoCloseMs: 4000,
+      });
+    } catch (e) {
+      console.error('Save failed:', e);
+    }
+  },
+
+  loadGameFromStorage: () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_SAVE);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      if (!data.stateVector || !data.turn) return false;
+
+      soundEngine.playUI('CONFIRM');
+      set({
+        stateVector: data.stateVector,
+        turn: data.turn,
+        phase: data.phase || Math.min(4, Math.ceil(data.turn / 6)),
+        activeCard: data.activeCard || INITIAL_CARDS[0],
+        cardQueue: data.cardQueue || [],
+        history: data.history || [{ turn: data.turn, state: data.stateVector, decisionTitle: 'Kayıt Yüklendi' }],
+        logs: data.logs || [],
+        advisors: data.advisors || JSON.parse(JSON.stringify(INITIAL_ADVISORS)),
+        decrees: data.decrees || JSON.parse(JSON.stringify(INITIAL_DECREES)),
+        isGameOver: false,
+        gameOverReason: null,
+        isInterruptActive: false,
+        hasStartedGame: true,
+      });
+
+      get().addToast({
+        type: 'INFO',
+        title: get().language === 'EN' ? 'SIMULATION LOADED' : 'KAYITLI SİMÜLASYON YÜKLENDİ',
+        message: get().language === 'EN' ? `Resumed from Turn #${data.turn}` : `Tur #${data.turn} konumundan devam ediliyor.`,
+        autoCloseMs: 4000,
+      });
+      return true;
+    } catch (e) {
+      console.error('Load failed:', e);
+      return false;
+    }
+  },
+
+  exportStateToJson: () => {
+    const { stateVector, turn, phase, history, logs, advisors, decrees } = get();
+    return JSON.stringify({ stateVector, turn, phase, history, logs, advisors, decrees, exportedAt: new Date().toISOString() }, null, 2);
+  },
+
+  importStateFromJson: (jsonStr: string) => {
+    try {
+      const data = JSON.parse(jsonStr);
+      if (!data.stateVector || !data.turn) return false;
+      set({
+        stateVector: data.stateVector,
+        turn: data.turn,
+        phase: data.phase || 1,
+        history: data.history || [],
+        logs: data.logs || [],
+        advisors: data.advisors || JSON.parse(JSON.stringify(INITIAL_ADVISORS)),
+        decrees: data.decrees || JSON.parse(JSON.stringify(INITIAL_DECREES)),
+        isGameOver: false,
+        gameOverReason: null,
+        hasStartedGame: true,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
   fetchIntelligence: async () => {
-    const { rateLimitStatus, logs } = get();
+    const { logs } = get();
 
     try {
       const res = await intelligenceService.fetchNews();
@@ -417,6 +735,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       phase: 1,
       activeCard: INITIAL_CARDS[0],
       cardQueue: INITIAL_CARDS.slice(1),
+      advisors: JSON.parse(JSON.stringify(INITIAL_ADVISORS)),
+      decrees: JSON.parse(JSON.stringify(INITIAL_DECREES)),
       history: [{ turn: 1, state: { ...INITIAL_VECTOR }, decisionTitle: 'Başlangıç Konumu' }],
       logs: [
         {
@@ -437,6 +757,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newMute = !get().isSoundMuted;
     soundEngine.setMuted(newMute);
     set({ isSoundMuted: newMute });
+  },
+
+  toggleAmbient: () => {
+    const isPlaying = soundEngine.toggleAmbient();
+    set({ isAmbientPlaying: isPlaying });
   },
 
   toggleLanguage: () => {
@@ -490,6 +815,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       phase: 1,
       activeCard: normalizedCard,
       cardQueue: INITIAL_CARDS.slice(1),
+      advisors: JSON.parse(JSON.stringify(INITIAL_ADVISORS)),
+      decrees: JSON.parse(JSON.stringify(INITIAL_DECREES)),
       history: [{ turn: 1, state: { ...data.stateVector }, decisionTitle: `Tarihsel Senaryo: ${data.title}` }],
       logs: [
         {

@@ -167,7 +167,7 @@ export const OperationCenter: React.FC = () => {
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-3.5 h-3.5 text-amber-500/80 shrink-0" />
             <span>
-              <strong>DEVLET AKLI v2.5:</strong> {language === 'EN' ? 'This simulation is entirely fictional and based on academic political science models. No relation to actual real-world persons or institutions.' : 'Bu simülasyon tamamen kurgusal olup akademik siyaset modellerine dayanır. Gerçek kurum ve kişilerle ilgisi yoktur.'}
+              <strong>DEVLET AKLI v3.0:</strong> {language === 'EN' ? 'This simulation is entirely fictional and based on academic political science models. No relation to actual real-world persons or institutions.' : 'Bu simülasyon tamamen kurgusal olup akademik siyaset modellerine dayanır. Gerçek kurum ve kişilerle ilgisi yoktur.'}
             </span>
           </div>
           <button
@@ -194,4 +194,3 @@ export const OperationCenter: React.FC = () => {
     </div>
   );
 };
-

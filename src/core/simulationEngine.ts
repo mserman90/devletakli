@@ -20,20 +20,35 @@ export interface DriftResult {
   summaryText: string[];
 }
 
+export interface AdvisorModifiers {
+  tpInflationDampener?: number; // e.g. 0.20 for 20% dampening
+  pidMichelsDampener?: number; // e.g. 0.25 for 25% dampening
+  gbProtection?: boolean; // prevents GB natural decay
+  ohProtection?: boolean; // prevents OH natural decay
+}
+
 /**
  * Otonom Sürüklenme Vektörü (Omega) Hesaplama
  */
-export function calculateDrift(S: StateVector): DriftResult {
+export function calculateDrift(S: StateVector, modifiers?: AdvisorModifiers): DriftResult {
   const summaryText: string[] = [];
 
   // 1. Robert Michels Oligarşileşme İvmesi
   // Eğer KP > 50 ve PID < 50 ise, her tur PID kaybı: -8.5 * (KP/100)^2 * (1 - PID/100)
   let deltaPID = 0;
   if (S.KP > 50 && S.PID < 50) {
-    deltaPID = -8.5 * Math.pow(S.KP / 100, 2) * (1 - S.PID / 100);
-    summaryText.push(
-      `[Michels Yasası] Kirli Para egemenliği Parti İçi Demokrasiyi zayıflatıyor (PID: ${deltaPID.toFixed(1)})`
-    );
+    let rawPID = -8.5 * Math.pow(S.KP / 100, 2) * (1 - S.PID / 100);
+    if (modifiers?.pidMichelsDampener) {
+      rawPID *= (1 - modifiers.pidMichelsDampener);
+      summaryText.push(
+        `[Michels Yasası - Danışman Kalkanı] Kirli Para etkisi sınırlandırıldı (PID: ${rawPID.toFixed(1)})`
+      );
+    } else {
+      summaryText.push(
+        `[Michels Yasası] Kirli Para egemenliği Parti İçi Demokrasiyi zayıflatıyor (PID: ${rawPID.toFixed(1)})`
+      );
+    }
+    deltaPID = rawPID;
   }
 
   // 2. Thomas Friedman Kur Dağınıklığı
@@ -54,29 +69,36 @@ export function calculateDrift(S: StateVector): DriftResult {
 
   // 3. Enflasyonist Bütçe Eriyik Hızı
   // TP kaybı: -4.0 * (1 + (KD/50)^2)
-  const deltaTP = -4.0 * (1 + Math.pow(S.KD / 50, 2));
-  summaryText.push(
-    `[Enflasyon Baskısı] Yüksek Kur Volatilitesi Temiz Parayı eritiyor (TP: ${deltaTP.toFixed(1)})`
-  );
+  let rawTP = -4.0 * (1 + Math.pow(S.KD / 50, 2));
+  if (modifiers?.tpInflationDampener) {
+    rawTP *= (1 - modifiers.tpInflationDampener);
+    summaryText.push(
+      `[Enflasyon Baskısı - Hazine Kalkanı] Rezerv erimesi hafifletildi (TP: ${rawTP.toFixed(1)})`
+    );
+  } else {
+    summaryText.push(
+      `[Enflasyon Baskısı] Yüksek Kur Volatilitesi Temiz Parayı eritiyor (TP: ${rawTP.toFixed(1)})`
+    );
+  }
+  const deltaTP = rawTP;
 
   // 4. Doğal Otonom Etkileşimler (Gölge Bürokrasi ve Overton Sürüklenmeleri)
-  // Gölge Bürokrasi kurumlaştıkça (GB > 60) kurumsal hafızayı güçlendirir
   let deltaGB = 0;
   if (S.GB < 30) {
-    deltaGB = -1.5; // Kurumsal erime
+    deltaGB = modifiers?.gbProtection ? 0 : -1.5;
   } else if (S.GB > 70) {
-    deltaGB = 0.8; // Derinleşen kurumsal ağ
+    deltaGB = 0.8;
   }
 
   // Overton Penceresi Medya gücü (OH) ile beslenir veya yıpranır
   let deltaOH = 0;
   if (S.OH < 30) {
-    deltaOH = -1.0; // Söylem alanının kaybolması
+    deltaOH = modifiers?.ohProtection ? 0 : -1.0;
   } else if (S.OH > 70 && S.KP < 40) {
-    deltaOH = 1.2; // Otonom medya hegemonyası
+    deltaOH = 1.2;
   }
 
-  // Kirli Para (KP) yüksek kaldıkça otomasyondan %1.5 artış eğilimi taşır
+  // Kirli Para (KP) yüksek kaldıkça otomasyondan %1.0 artış eğilimi taşır
   let deltaKP = 0;
   if (S.KP > 60) {
     deltaKP = 1.0;
@@ -99,9 +121,10 @@ export function calculateDrift(S: StateVector): DriftResult {
  */
 export function processTurn(
   currentState: StateVector,
-  decisionDelta: Partial<StateVector>
+  decisionDelta: Partial<StateVector>,
+  modifiers?: AdvisorModifiers
 ): { nextState: StateVector; drift: DriftResult } {
-  const drift = calculateDrift(currentState);
+  const drift = calculateDrift(currentState, modifiers);
 
   const nextState: StateVector = {
     TP: clamp(currentState.TP + (decisionDelta.TP || 0) + drift.deltaTP),

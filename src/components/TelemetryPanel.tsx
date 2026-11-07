@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Activity, Info, TrendingUp, DollarSign, Users, Shield, Landmark, Globe } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Legend,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from 'recharts';
+import { Activity, Info, TrendingUp, DollarSign, Users, Shield, Landmark, Globe, Compass, BarChart3 } from 'lucide-react';
 import { StateVector } from '../types/game';
 import { Tooltip } from './Tooltip';
+import { soundEngine } from '../utils/soundEngine';
 import { UI_TRANSLATIONS } from '../utils/translations';
 
 interface VariableMeta {
@@ -82,13 +96,24 @@ const METRICS: VariableMeta[] = [
 
 export const TelemetryPanel: React.FC = () => {
   const { stateVector, history, language } = useGameStore();
+  const [graphMode, setGraphMode] = useState<'LINE' | 'RADAR'>('RADAR');
 
   const t = UI_TRANSLATIONS[language].telemetry;
+  const isEn = language === 'EN';
 
   const chartData = history.map((item) => ({
     turn: `T${item.turn}`,
     ...item.state,
   }));
+
+  const radarData = [
+    { subject: 'TP', value: stateVector.TP, ideal: 70, fullMark: 100 },
+    { subject: 'KP', value: stateVector.KP, ideal: 30, fullMark: 100 },
+    { subject: 'PID', value: stateVector.PID, ideal: 65, fullMark: 100 },
+    { subject: 'GB', value: stateVector.GB, ideal: 60, fullMark: 100 },
+    { subject: 'OH', value: stateVector.OH, ideal: 65, fullMark: 100 },
+    { subject: 'KD', value: stateVector.KD, ideal: 30, fullMark: 100 },
+  ];
 
   return (
     <div className="bg-[#fffbeb] text-slate-900 border-2 border-amber-900/50 rounded-sm p-3 sm:p-4 flex flex-col h-full shadow-2xl relative font-sans select-none md:rotate-[0.5deg] hover:rotate-0 transition-transform duration-300">
@@ -111,7 +136,9 @@ export const TelemetryPanel: React.FC = () => {
           </div>
           <div>
             <h2 className="text-xs font-black text-amber-950 uppercase tracking-widest font-serif">{t.title}</h2>
-            <p className="text-[10px] font-mono text-amber-900/70">{language === 'EN' ? '6-Dimensional Strategic Resource Report' : '6-Boyutlu Stratejik Kaynak Raporu'}</p>
+            <p className="text-[10px] font-mono text-amber-900/70">
+              {language === 'EN' ? '6-Dimensional Strategic Resource Report' : '6-Boyutlu Stratejik Kaynak Raporu'}
+            </p>
           </div>
         </div>
       </div>
@@ -156,47 +183,94 @@ export const TelemetryPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Historical Graph Paper */}
-      <div className="flex-1 mt-1 border border-amber-900/30 rounded p-2 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:12px_12px] bg-amber-50/90 flex flex-col min-h-[190px] shadow-inner relative">
+      {/* Historical Graph / Radar Toggle Bar */}
+      <div className="flex-1 mt-1 border border-amber-900/30 rounded p-2 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:12px_12px] bg-amber-50/90 flex flex-col min-h-[220px] shadow-inner relative">
         
         {/* Paper Clip Graphic in corner */}
         <div className="absolute -top-2 right-2 w-3 h-6 border-2 border-slate-500 rounded-t-full bg-slate-300 shadow-sm" />
 
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1 pb-1 border-b border-amber-900/20">
           <span className="text-[10px] font-mono font-bold text-amber-950 flex items-center gap-1">
-            <Info className="w-3 h-3 text-amber-800" /> {language === 'EN' ? 'POLITICAL TREND GRAPH (TURNS):' : 'SİYASİ EĞİLİM GRAFİĞİ (TURLAR):'}
+            <Info className="w-3 h-3 text-amber-800" />
+            {graphMode === 'RADAR'
+              ? (isEn ? '6D TACTICAL VECTOR RADAR:' : '6-BOYUTLU GÜÇ RADARI:')
+              : (isEn ? 'POLITICAL TREND GRAPH (TURNS):' : 'SİYASİ EĞİLİM GRAFİĞİ (TURLAR):')}
           </span>
+
+          {/* Mode Switcher Buttons */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => {
+                soundEngine.playUI('HOVER');
+                setGraphMode('RADAR');
+              }}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 border transition-all ${
+                graphMode === 'RADAR'
+                  ? 'bg-amber-900 text-amber-100 border-amber-950 shadow-sm'
+                  : 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+              }`}
+            >
+              <Compass className="w-3 h-3" /> {isEn ? 'RADAR' : 'RADAR'}
+            </button>
+            <button
+              onClick={() => {
+                soundEngine.playUI('HOVER');
+                setGraphMode('LINE');
+              }}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 border transition-all ${
+                graphMode === 'LINE'
+                  ? 'bg-amber-900 text-amber-100 border-amber-950 shadow-sm'
+                  : 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+              }`}
+            >
+              <BarChart3 className="w-3 h-3" /> {isEn ? 'TREND' : 'EĞİLİM'}
+            </button>
+          </div>
         </div>
 
-        <div className="flex-1 w-full h-full min-h-[160px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
-              <XAxis dataKey="turn" stroke="#78350f" fontSize={9} tickLine={false} fontFamily="monospace" />
-              <YAxis domain={[0, 100]} stroke="#78350f" fontSize={9} tickLine={false} fontFamily="monospace" />
-              <RechartsTooltip
-                contentStyle={{
-                  backgroundColor: '#fef3c7',
-                  borderColor: '#92400e',
-                  borderRadius: '0.25rem',
-                  fontSize: '10px',
-                  fontFamily: 'monospace',
-                  color: '#451a03',
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: '9px', paddingTop: '2px', fontFamily: 'monospace' }} />
-              {METRICS.map((m) => (
-                <Line
-                  key={m.key}
-                  type="monotone"
-                  dataKey={m.key}
-                  stroke={m.color}
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                  activeDot={{ r: 4 }}
+        {/* Chart View */}
+        <div className="flex-1 w-full h-full min-h-[175px]">
+          {graphMode === 'RADAR' ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
+                <PolarGrid stroke="#b45309" strokeDasharray="3 3" opacity={0.4} />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#78350f', fontSize: 10, fontFamily: 'monospace', fontWeight: 'bold' }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#b45309" tick={{ fill: '#78350f', fontSize: 8 }} />
+                <Radar name={isEn ? 'Current Vector' : 'Mevcut Değer'} dataKey="value" stroke="#b45309" fill="#d97706" fillOpacity={0.45} strokeWidth={2} />
+                <Radar name={isEn ? 'Target Equilibrium' : 'Hedef Denge'} dataKey="ideal" stroke="#059669" fill="#10b981" fillOpacity={0.15} strokeDasharray="3 3" strokeWidth={1.5} />
+                <Legend wrapperStyle={{ fontSize: '9px', paddingTop: '2px', fontFamily: 'monospace' }} />
+              </RadarChart>
+            </ResponsiveContainer>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                <XAxis dataKey="turn" stroke="#78350f" fontSize={9} tickLine={false} fontFamily="monospace" />
+                <YAxis domain={[0, 100]} stroke="#78350f" fontSize={9} tickLine={false} fontFamily="monospace" />
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: '#fef3c7',
+                    borderColor: '#92400e',
+                    borderRadius: '0.25rem',
+                    fontSize: '10px',
+                    fontFamily: 'monospace',
+                    color: '#451a03',
+                  }}
                 />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+                <Legend wrapperStyle={{ fontSize: '9px', paddingTop: '2px', fontFamily: 'monospace' }} />
+                {METRICS.map((m) => (
+                  <Line
+                    key={m.key}
+                    type="monotone"
+                    dataKey={m.key}
+                    stroke={m.color}
+                    strokeWidth={2}
+                    dot={{ r: 2 }}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

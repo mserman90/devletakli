@@ -35,8 +35,17 @@ export class AdversarialAIEngine {
    * Tehdit Aktörlerinin Durum Vektörünü Değerlendirmesi
    * Tehlikeli sınırlara ulaşıldığında acil durum sabotaj kartı üretir.
    */
-  public evaluateThreats(stateVector: StateVector, currentTurn: number): DecisionCard | null {
+  public evaluateThreats(
+    stateVector: StateVector,
+    currentTurn: number,
+    threatResistance: boolean = false
+  ): DecisionCard | null {
     this.tickCooldowns();
+
+    // Güvenlik Danışmanı kalkanı varsa %35 olasılıkla tehdit savuşturulur
+    if (threatResistance && Math.random() < 0.35) {
+      return null;
+    }
 
     // 1. KÜRESEL SERMAYE AĞLARI TAARRUZU
     // Eşik: TP > 70 && OH > 65 && KP < 30 (Finansal ve söylemsel özerklik küresel sermayeyi tehdit ediyor)
@@ -44,7 +53,7 @@ export class AdversarialAIEngine {
       this.state.globalCapitalCooldown === 0 &&
       ((stateVector.TP > 70 && stateVector.OH > 65 && stateVector.KP < 30) || stateVector.KD > 75)
     ) {
-      this.state.globalCapitalCooldown = 3; // 3 tur soğuma
+      this.state.globalCapitalCooldown = threatResistance ? 4 : 3; // kalkanlı durumda daha uzun soğuma
       return this.generateGlobalCapitalSabotage(stateVector, currentTurn);
     }
 
@@ -54,7 +63,7 @@ export class AdversarialAIEngine {
       this.state.nationalEstablishmentCooldown === 0 &&
       ((stateVector.PID > 65 && stateVector.GB < 35) || (stateVector.OH > 70 && stateVector.GB < 40))
     ) {
-      this.state.nationalEstablishmentCooldown = 3; // 3 tur soğuma
+      this.state.nationalEstablishmentCooldown = threatResistance ? 4 : 3;
       return this.generateNationalEstablishmentSabotage(stateVector, currentTurn);
     }
 
