@@ -142,3 +142,23 @@ Turn \ge 18 & (\text{Kurumsal İstikrar Süresi})
   * *Çözüm:* IMF şartlarını kabul etmek geçici rahatlama sağlasa da ülkeyi vesayet altına sokar. Eğer `TP` rezerviniz güçlüyse `Sermaye Kontrolleri ve Yerel Para Savunması` seçeneğiyle dik durun; ardından Selim Aras'ın doktrini ile kuru sakinleştirin.
 * **Soru: Oyun seslerini veya ambiyansı nasıl kapatabilirim?**  
   * *Çözüm:* Üst bardaki `Ses (Hoparlör)` simgesi tüm UI seslerini; yanındaki `Ambiyans (Radyo)` simgesi ise düşük frekanslı arka plan synthesizer dronunu sessize alır.
+
+---
+
+## 7. Mobil Uyumluluk, Dokunmatik Jestler ve Progressive Web App (PWA)
+
+Devlet Aklı v3.0, masaüstü deneyiminin yanı sıra akıllı telefon ve tabletlerde kesintisiz çalışacak şekilde **Progressive Web App (PWA)** standartlarında geliştirilmiştir.
+
+### 7.1. PWA Olarak Telefona ve Masaüstüne Yükleme
+* **Android / Chrome / Edge:** Uygulama açıldığında ekranda beliren *"Hemen Yükle"* butonuna veya üst menüdeki *"PWA Yükle"* butonuna basarak simülasyonu ana ekranınıza yerel bir uygulama gibi ekleyebilirsiniz.
+* **iOS / Safari:** Safari'nin altındaki **Paylaş (Share)** simgesine dokunun ve listeden **"Ana Ekrana Ekle" (Add to Home Screen)** seçeneğini işaretleyin.
+* **Tam Ekran Deneyimi:** PWA kurulduğunda tarayıcı URL çubuğu kaybolur ve uygulama tam ekran yerel bir mobil oyun gibi çalışır.
+
+### 7.2. Çevrimdışı (Offline) Tam Oynanabilirlik
+* Oyunun tüm simülasyon motoru, kart algoritmaları, 6D durum vektörü hesaplamaları ve Web Audio ses sentezleyicileri istemci (client-side) tarafında çalışır.
+* `Service Worker` sayesinde internet bağlantınız kopsa veya uçak modunda olsanız bile oyun kesintisiz olarak açılır ve oynanabilir.
+
+### 7.3. Mobil Panaroma ve Dokunmatik Kontroller
+* **Mobil Panaroma Çubuğu:** Ekranın üst ve alt kısmında yer alan hızlı geçiş dock'u sayesinde **Karar Masası**, **Kaynaklar**, **Radar/Telemetri**, **İstihbarat** ve **Günlük** panelleri arasında tek dokunuşla geçiş yapabilirsiniz.
+* **Kart Kaydırma (Swipe Gestures):** Karar kartlarını parmağınızla sola kaydırarak 1. seçeneği, sağa kaydırarak 2. seçeneği onaylayabilirsiniz.
+* **Ergonomik Mobil Menü:** Küçük ekranlarda sağ üstteki menü butonuna dokunarak Gölge Kabine, KHK, Bilgi Bankası, Ses, Dil ve Kayıt panellerine kolayca erişebilirsiniz.

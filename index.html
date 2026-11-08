@@ -2,12 +2,22 @@
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <title>Devlet Aklı: Siyasi Strateji & Müesses Nizam Simülasyonu</title>
     <meta name="description" content="Ulusal müesses nizam, küresel sermaye ağları ve gölge bürokrasi ile mücadeleyi simüle eden stratejik siyaset ve devlet yönetimi simülasyonu." />
+    
+    <!-- PWA & Mobile Web Capabilities -->
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <meta name="theme-color" content="#020617" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Devlet Aklı" />
+    <meta name="format-detection" content="telephone=no" />
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased">
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-white min-h-[100dvh]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

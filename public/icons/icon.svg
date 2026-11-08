@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Outer Gold Rim -->
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="none" stroke="url(#goldGrad)" stroke-width="8" opacity="0.85"/>
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="6,6" opacity="0.4"/>
+
+  <!-- Shield Contour -->
+  <path d="M 256 80 
+           C 340 80, 390 120, 400 240
+           C 400 340, 310 400, 256 440
+           C 202 400, 112 340, 112 240
+           C 122 120, 172 80, 256 80 Z" 
+        fill="url(#shieldGrad)" 
+        stroke="url(#goldGrad)" 
+        stroke-width="12"
+        filter="url(#glow)"/>
+
+  <!-- Emblem Details: Central Star and Scales of Balance -->
+  <!-- Central Vertical Axis -->
+  <line x1="256" y1="130" x2="256" y2="390" stroke="#fef08a" stroke-width="4" stroke-linecap="round"/>
+  <!-- Horizontal Balance Bar -->
+  <line x1="170" y1="210" x2="342" y2="210" stroke="#fef08a" stroke-width="5" stroke-linecap="round"/>
+  
+  <!-- Left Scale Pan -->
+  <path d="M 170 210 L 150 270 L 190 270 Z" fill="none" stroke="#d97706" stroke-width="3"/>
+  <ellipse cx="170" cy="275" rx="30" ry="10" fill="#047857" stroke="#fbbf24" stroke-width="3"/>
+
+  <!-- Right Scale Pan -->
+  <path d="M 342 210 L 322 270 L 362 270 Z" fill="none" stroke="#d97706" stroke-width="3"/>
+  <ellipse cx="342" cy="275" rx="30" ry="10" fill="#047857" stroke="#fbbf24" stroke-width="3"/>
+
+  <!-- Center Crescent and Star Crest -->
+  <circle cx="256" cy="170" r="24" fill="#fbbf24"/>
+  <circle cx="264" cy="166" r="20" fill="#064e3b"/>
+  <!-- Star -->
+  <polygon points="274,166 277,172 284,173 279,178 280,185 274,181 268,185 269,178 264,173 271,172" fill="#fef08a"/>
+
+  <!-- Statecraft Text Ring or Monogram -->
+  <text x="256" y="350" font-family="Georgia, serif" font-size="28" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="4">
+    DEVLET AKLI
+  </text>
+  <text x="256" y="375" font-family="monospace" font-size="14" fill="#34d399" text-anchor="middle" letter-spacing="2">
+    EST. 2026 // RATIO STATUS
+  </text>
+</svg>

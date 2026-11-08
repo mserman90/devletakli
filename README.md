@@ -148,6 +148,12 @@ Harici ses dosyası indirmeden, tarayıcının yerel **Web Audio API** osilatör
 * Kalp atışı panik nabız simülatörü ($135\text{ BPM}$)
 * Kararname mühürleme ve danışman telsiz doktrini tonları
 
+### 3.8. Progressive Web App (PWA), Çevrimdışı Mod & Mobil Ergonomi
+* **Web App Manifest & Service Worker:** Cihaza (iOS / Android / Desktop) yerel uygulama gibi yüklenebilir, internet bağlantısı olmadan çevrimdışı kesintisiz oynanabilir.
+* **Mobil Panaroma & Dokunmatik Dock:** Mobil ekranlarda Karar Masası, Kaynaklar, Radar ve İstihbarat arasında tek dokunuşla geçiş sağlayan alt kontrol dock'u.
+* **Kart Kaydırma (Swipe Gestures):** Dokunmatik ekranlarda karar kartlarını parmakla sola/sağa kaydırarak anında hamle yapabilme desteği.
+* **Modern Dynamic Viewport (`dvh`) & Safe-Area:** Mobil çentik ve adres çubuğu sıçramalarını önleyen tam uyumlu yerleşim mimarisi.
+
 ---
 
 ## 4. Kurulum ve Yerel Çalıştırma

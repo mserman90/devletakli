@@ -50,7 +50,7 @@ export const KnowledgeBaseModal: React.FC<KnowledgeBaseModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/85 backdrop-blur-md animate-fadeIn select-none">
-      <div className="w-full max-w-5xl h-[94vh] sm:h-[90vh] flex flex-col rounded-xl sm:rounded-2xl border-2 border-amber-900/60 bg-slate-900 text-slate-100 shadow-2xl overflow-hidden relative font-sans">
+      <div className="w-full max-w-5xl h-[88dvh] sm:h-[90dvh] flex flex-col rounded-xl sm:rounded-2xl border-2 border-amber-900/60 bg-slate-900 text-slate-100 shadow-2xl overflow-hidden relative font-sans">
         
         {/* Header */}
         <div className="bg-amber-950/80 px-4 sm:px-6 py-3.5 border-b border-amber-900/60 flex items-center justify-between shrink-0 gap-3">

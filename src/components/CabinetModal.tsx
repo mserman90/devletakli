@@ -35,7 +35,7 @@ export const CabinetModal: React.FC<CabinetModalProps> = ({ isOpen, onClose }) =
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn select-none">
-      <div className="w-full max-w-4xl bg-slate-900 border-2 border-amber-800/80 rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden text-slate-100 font-sans">
+      <div className="w-full max-w-4xl bg-slate-900 border-2 border-amber-800/80 rounded-2xl shadow-2xl flex flex-col max-h-[88dvh] overflow-hidden text-slate-100 font-sans">
         
         {/* Header */}
         <div className="bg-amber-950/80 px-4 sm:px-6 py-3.5 border-b border-amber-800/60 flex items-center justify-between">

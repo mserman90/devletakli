@@ -130,7 +130,7 @@ https://github.com/mserman90/devletakli`;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn select-none">
       <div
-        className={`w-full max-w-xl p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 shadow-2xl bg-slate-900 ${details.borderColor} text-slate-100 flex flex-col items-center text-center relative overflow-hidden max-h-[95vh] overflow-y-auto`}
+        className={`w-full max-w-xl p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 shadow-2xl bg-slate-900 ${details.borderColor} text-slate-100 flex flex-col items-center text-center relative overflow-hidden max-h-[88dvh] overflow-y-auto`}
       >
         {/* Top Icon */}
         <div className="p-3 sm:p-4 rounded-full bg-slate-950 border border-slate-800 my-1.5 sm:my-2">{details.icon}</div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HeaderBar } from './HeaderBar';
+import { PWAInstallBanner } from './PWAInstallBanner';
 import { ResourceDashboard } from './ResourceDashboard';
 import { IntelligenceTicker } from './IntelligenceTicker';
 import { DecisionDesk } from './DecisionDesk';
@@ -31,21 +32,22 @@ export const OperationCenter: React.FC = () => {
   const handleTabSelect = (tab: MobileTab) => {
     soundEngine.playUI('HOVER');
     setMobileTab(tab);
+    // Smooth scroll back to top of workspace when switching views on mobile
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-[100dvh] bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white pb-14 lg:pb-0">
+      
+      {/* PWA Floating Install & Offline Alert Banner */}
+      <PWAInstallBanner />
+
       {/* Top Header Navigation */}
       <HeaderBar />
 
-      {/* Mobile View Switcher Bar (visible on < lg screens) */}
-      <div className="lg:hidden bg-slate-900/90 border-b border-amber-900/40 px-2 py-2 backdrop-blur-md sticky top-0 z-30">
-        <div className="flex items-center justify-between text-xs font-mono mb-1 px-1">
-          <span className="text-amber-400/90 text-[10px] uppercase font-bold flex items-center gap-1">
-            <Layers className="w-3 h-3 text-amber-400" /> {language === 'EN' ? 'MOBILE VIEW MODE:' : 'MOBİL PANAROMA MODU:'}
-          </span>
-        </div>
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none font-mono text-xs">
+      {/* Mobile Panorama Switcher Bar (visible on < lg screens) */}
+      <div className="lg:hidden bg-slate-900/95 border-b border-amber-900/40 px-2 py-1.5 backdrop-blur-md sticky top-0 z-30 shadow-md">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none font-mono text-xs">
           <button
             onClick={() => handleTabSelect('ALL')}
             className={`px-2.5 py-1.5 rounded-lg border flex items-center gap-1.5 shrink-0 transition-all text-[11px] font-bold ${
@@ -59,18 +61,6 @@ export const OperationCenter: React.FC = () => {
           </button>
 
           <button
-            onClick={() => handleTabSelect('RESOURCE')}
-            className={`px-2.5 py-1.5 rounded-lg border flex items-center gap-1.5 shrink-0 transition-all text-[11px] font-bold ${
-              mobileTab === 'RESOURCE'
-                ? 'bg-indigo-600 border-indigo-400 text-slate-950 shadow'
-                : 'bg-slate-900 border-slate-700 text-slate-300'
-            }`}
-          >
-            <Gauge className="w-3.5 h-3.5" />
-            <span>{language === 'EN' ? 'RESOURCES' : 'KAYNAKLAR'}</span>
-          </button>
-
-          <button
             onClick={() => handleTabSelect('DECISION')}
             className={`px-2.5 py-1.5 rounded-lg border flex items-center gap-1.5 shrink-0 transition-all text-[11px] font-bold ${
               mobileTab === 'DECISION'
@@ -80,6 +70,18 @@ export const OperationCenter: React.FC = () => {
           >
             <Compass className="w-3.5 h-3.5" />
             <span>{t.DECISION}</span>
+          </button>
+
+          <button
+            onClick={() => handleTabSelect('RESOURCE')}
+            className={`px-2.5 py-1.5 rounded-lg border flex items-center gap-1.5 shrink-0 transition-all text-[11px] font-bold ${
+              mobileTab === 'RESOURCE'
+                ? 'bg-indigo-600 border-indigo-400 text-slate-950 shadow'
+                : 'bg-slate-900 border-slate-700 text-slate-300'
+            }`}
+          >
+            <Gauge className="w-3.5 h-3.5" />
+            <span>{language === 'EN' ? 'RESOURCES' : 'KAYNAKLAR'}</span>
           </button>
 
           <button
@@ -132,7 +134,7 @@ export const OperationCenter: React.FC = () => {
 
         {/* Decision Desk & AI Strategy Advisor */}
         {(mobileTab === 'ALL' || mobileTab === 'DECISION') && (
-          <div className="order-1 lg:order-2 lg:col-span-5 flex flex-col gap-3 sm:gap-4 min-h-[460px] sm:min-h-[480px]">
+          <div className="order-1 lg:order-2 lg:col-span-5 flex flex-col gap-3 sm:gap-4 min-h-[420px] sm:min-h-[480px]">
             <DecisionDesk />
             <StrategyTips />
           </div>
@@ -140,14 +142,14 @@ export const OperationCenter: React.FC = () => {
 
         {/* Telemetry Panel */}
         {(mobileTab === 'ALL' || mobileTab === 'TELEMETRY') && (
-          <div className="order-2 lg:order-3 lg:col-span-4 min-h-[400px] sm:min-h-[440px]">
+          <div className="order-2 lg:order-3 lg:col-span-4 min-h-[380px] sm:min-h-[440px]">
             <TelemetryPanel />
           </div>
         )}
 
         {/* Intelligence Ticker */}
         {(mobileTab === 'ALL' || mobileTab === 'INTELLIGENCE') && (
-          <div className="order-3 lg:order-1 lg:col-span-3 min-h-[380px] lg:h-auto">
+          <div className="order-3 lg:order-1 lg:col-span-3 min-h-[340px] lg:h-auto">
             <IntelligenceTicker />
           </div>
         )}
@@ -179,6 +181,59 @@ export const OperationCenter: React.FC = () => {
           </button>
         </div>
       </footer>
+
+      {/* Mobile Fixed Bottom Navigation Bar (visible on < lg) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 border-t border-amber-900/50 px-2 py-1.5 backdrop-blur-lg z-30 flex items-center justify-around shadow-2xl">
+        <button
+          onClick={() => handleTabSelect('DECISION')}
+          className={`flex flex-col items-center py-1 px-2 rounded-lg transition-colors ${
+            mobileTab === 'DECISION' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Compass className="w-4 h-4 mb-0.5" />
+          <span className="text-[10px] font-mono">{t.DECISION}</span>
+        </button>
+
+        <button
+          onClick={() => handleTabSelect('RESOURCE')}
+          className={`flex flex-col items-center py-1 px-2 rounded-lg transition-colors ${
+            mobileTab === 'RESOURCE' ? 'text-indigo-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Gauge className="w-4 h-4 mb-0.5" />
+          <span className="text-[10px] font-mono">{language === 'EN' ? 'Resource' : 'Kaynak'}</span>
+        </button>
+
+        <button
+          onClick={() => handleTabSelect('TELEMETRY')}
+          className={`flex flex-col items-center py-1 px-2 rounded-lg transition-colors ${
+            mobileTab === 'TELEMETRY' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Activity className="w-4 h-4 mb-0.5" />
+          <span className="text-[10px] font-mono">{t.TELEMETRY}</span>
+        </button>
+
+        <button
+          onClick={() => handleTabSelect('INTELLIGENCE')}
+          className={`flex flex-col items-center py-1 px-2 rounded-lg transition-colors ${
+            mobileTab === 'INTELLIGENCE' ? 'text-red-400 font-bold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Radio className="w-4 h-4 mb-0.5" />
+          <span className="text-[10px] font-mono">{t.INTELLIGENCE}</span>
+        </button>
+
+        <button
+          onClick={() => handleTabSelect('ALL')}
+          className={`flex flex-col items-center py-1 px-2 rounded-lg transition-colors ${
+            mobileTab === 'ALL' ? 'text-amber-300 font-bold' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Layers className="w-4 h-4 mb-0.5" />
+          <span className="text-[10px] font-mono">{t.ALL}</span>
+        </button>
+      </div>
 
       {/* Toast Notifications System */}
       <ToastContainer />

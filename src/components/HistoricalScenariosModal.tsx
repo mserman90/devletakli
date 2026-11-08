@@ -155,8 +155,8 @@ export const HistoricalScenariosModal: React.FC<HistoricalScenariosModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-[110] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 font-sans text-slate-100 select-none overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden relative my-auto">
+    <div className="fixed inset-0 z-[110] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 font-sans text-slate-100 select-none">
+      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden relative my-auto max-h-[88dvh] flex flex-col">
         
         {/* Header Bar */}
         <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">

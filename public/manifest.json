@@ -1,0 +1,49 @@
+{
+  "name": "Devlet Aklı: Siyasi Strateji & Müesses Nizam",
+  "short_name": "Devlet Aklı",
+  "description": "Ulusal müesses nizam, küresel sermaye ağları ve gölge bürokrasi ile mücadeleyi simüle eden stratejik siyaset simülasyonu.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["games", "simulation", "education", "politics"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Yeni Simülasyon",
+      "short_name": "Başla",
+      "description": "Yeni bir devlet yönetimi oturumu başlat",
+      "url": "./",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
